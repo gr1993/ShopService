@@ -1,0 +1,76 @@
+package park.shop.repository.member;
+
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import park.shop.domain.Member;
+
+import javax.persistence.EntityManager;
+import java.util.List;
+import java.util.Optional;
+
+import static park.shop.domain.QMember.member;
+
+@Transactional
+@Repository
+public class MemberRepositoryImpl implements MemberRepository{
+
+    private final EntityManager em;
+    private final JPAQueryFactory query;
+
+    public MemberRepositoryImpl(EntityManager em) {
+        this.em = em;
+        this.query = new JPAQueryFactory(em);
+    }
+
+    @Override
+    public Member save(Member member) {
+        em.persist(member);
+        return member;
+    }
+
+    @Override
+    public void update(Long memberId, MemberUpdateDto updateDto) {
+        Member findMember = em.find(Member.class, memberId);
+        findMember.setPassword(updateDto.getPassword());
+        findMember.setName(updateDto.getName());
+        findMember.setGender(updateDto.getGender());
+        findMember.setAddress(updateDto.getAddress());
+        findMember.setRole(updateDto.getRole());
+        findMember.setIsDelete(updateDto.getIsDelete());
+    }
+
+    @Override
+    public Optional<Member> findById(Long id) {
+        Member member = em.find(Member.class, id);
+        return Optional.ofNullable(member);
+    }
+
+    @Override
+    public List<Member> findAll(MemberSearchCond cond) {
+        String loginId = cond.getLoginId();
+        String name = cond.getName();
+
+        return query
+                .select(member)
+                .from(member)
+                .where(likeLoginId(loginId), likeName(name))
+                .fetch();
+    }
+
+    private BooleanExpression likeLoginId(String loginId) {
+        if(StringUtils.hasText(loginId)) {
+            return member.loginId.like("%" + loginId + "%");
+        }
+        return null;
+    }
+
+    private BooleanExpression likeName(String name) {
+        if(StringUtils.hasText(name)) {
+            return member.name.like("%" + name + "%");
+        }
+        return null;
+    }
+}

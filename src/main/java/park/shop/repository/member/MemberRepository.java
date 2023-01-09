@@ -1,0 +1,17 @@
+package park.shop.repository.member;
+
+import park.shop.domain.Member;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface MemberRepository {
+
+    Member save(Member member);
+
+    void update(Long memberId, MemberUpdateDto updateDto);
+
+    Optional<Member> findById(Long id);
+
+    List<Member> findAll(MemberSearchCond cond);
+}
