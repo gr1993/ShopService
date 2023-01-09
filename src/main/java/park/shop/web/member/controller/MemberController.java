@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,8 +35,22 @@ public class MemberController {
     }
 
     @PostMapping("/register")
-    public String register(@ModelAttribute MemberRegisterDto memberRegisterDto) {
+    public String register(
+            @Validated @ModelAttribute("member") MemberRegisterDto memberRegisterDto,
+            BindingResult bindingResult,
+            Model model) {
+
+        if (memberRegisterDto.getGender() == null) {
+            bindingResult.addError(new FieldError("member", "gender", null, false, new String[] {"NotBlank.member.gender"}, null, null));
+        }
+
+        if (bindingResult.hasErrors()) {
+            log.info("errors = {}", bindingResult);
+            return "register";
+        }
+
         memberService.registerMember(memberRegisterDto);
-        return "redirect:/login";
+        model.addAttribute("isSuccess", true);
+        return "register";
     }
 }
