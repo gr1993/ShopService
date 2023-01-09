@@ -5,13 +5,13 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import park.shop.domain.Member;
+import park.shop.domain.member.Member;
 
 import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 
-import static park.shop.domain.QMember.member;
+import static park.shop.domain.member.QMember.member;
 
 @Transactional
 @Repository
@@ -36,7 +36,7 @@ public class MemberRepositoryImpl implements MemberRepository{
         Member findMember = em.find(Member.class, memberId);
         findMember.setPassword(updateDto.getPassword());
         findMember.setName(updateDto.getName());
-        findMember.setGender(updateDto.getGender());
+        findMember.setGender(updateDto.getGender().toString());
         findMember.setAddress(updateDto.getAddress());
         findMember.setRole(updateDto.getRole());
         findMember.setIsDelete(updateDto.getIsDelete());

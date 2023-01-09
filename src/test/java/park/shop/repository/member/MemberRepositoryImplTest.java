@@ -4,7 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import park.shop.domain.Member;
+import park.shop.domain.member.GenderType;
+import park.shop.domain.member.Member;
 
 import java.util.List;
 
@@ -20,7 +21,7 @@ class MemberRepositoryImplTest {
     @Test
     void save() {
         //given
-        Member member = createDumpMember("1", "남");
+        Member member = createDumpMember("1", GenderType.M);
 
         //when
         Member savedMember = memberRepository.save(member);
@@ -33,14 +34,14 @@ class MemberRepositoryImplTest {
     @Test
     void update() {
         //given
-        Member member = createDumpMember("1", "남");
+        Member member = createDumpMember("1", GenderType.M);
         Member savedMember = memberRepository.save(member);
         Long memberId = savedMember.getId();
 
         //when
         MemberUpdateDto updateDto = new MemberUpdateDto();
         updateDto.setAddress("주소2");
-        updateDto.setGender("남");
+        updateDto.setGender(GenderType.F);
         updateDto.setPassword("test2");
         updateDto.setName("박강린2");
         updateDto.setRole("판매자");
@@ -60,9 +61,9 @@ class MemberRepositoryImplTest {
     @Test
     void findMembers() {
         //given
-        Member member1 = createDumpMember("1", "남");
-        Member member2 = createDumpMember("2", "여");
-        Member member3 = createDumpMember("3", "남");
+        Member member1 = createDumpMember("1", GenderType.M);
+        Member member2 = createDumpMember("2", GenderType.F);
+        Member member3 = createDumpMember("3", GenderType.M);
 
         memberRepository.save(member1);
         memberRepository.save(member2);
@@ -89,13 +90,13 @@ class MemberRepositoryImplTest {
         assertThat(result).containsExactly(members);
     }
 
-    Member createDumpMember(String addText, String gender) {
+    Member createDumpMember(String addText, GenderType gender) {
         Member member = new Member();
         member.setLoginId("test" + addText);
         member.setPassword("pw" + addText);
         member.setName("박강림" + addText);
         member.setRole("일반" + addText);
-        member.setGender(gender);
+        member.setGender(gender.toString());
         member.setLoginType("web" + addText);
         member.setAddress("주소" + addText);
 

@@ -1,6 +1,6 @@
 package park.shop.repository.member;
 
-import park.shop.domain.Member;
+import park.shop.domain.member.Member;
 
 import java.util.List;
 import java.util.Optional;

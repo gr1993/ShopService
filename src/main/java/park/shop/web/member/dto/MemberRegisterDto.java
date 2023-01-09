@@ -1,4 +1,4 @@
-package park.shop.repository.member;
+package park.shop.web.member.dto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -6,16 +6,12 @@ import park.shop.domain.member.GenderType;
 
 @Setter
 @Getter
-public class MemberUpdateDto {
+public class MemberRegisterDto {
+    private String loginId;
     private String password;
+    private String passwordCheck;
 
     private String name;
-
-    private GenderType gender;
-
     private String address;
-
-    private String role;
-
-    private String isDelete;
+    private GenderType gender;
 }

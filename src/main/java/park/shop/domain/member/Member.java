@@ -1,4 +1,4 @@
-package park.shop.domain;
+package park.shop.domain.member;
 
 import com.sun.istack.NotNull;
 import lombok.Data;
