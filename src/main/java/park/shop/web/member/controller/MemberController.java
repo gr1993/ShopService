@@ -94,6 +94,15 @@ public class MemberController {
         return "redirect:" + redirectURL;
     }
 
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        return "redirect:/";
+    }
+
     @GetMapping("/myInfo")
     public String myInfoForm(@Login Member member, Model model) {
         MemberInfoDto memberInfoDto = new MemberInfoDto();

@@ -28,6 +28,7 @@
         <li th:if="${isLogin == null || !isLogin}" class="nav-item"><a class="nav-link" href="/member/register">회원가입</a></li>
         <li th:if="${isLogin}" class="nav-item"><a class="nav-link" href="/member/myInfo">내정보</a></li>
         <li th:if="${isLogin}" class="nav-item"><a class="nav-link" href="#">주문내역</a></li>
+        <li th:if="${isLogin}" class="nav-item"><a class="nav-link" href="/member/logout">로그아웃</a></li>
       </ul>
       <form th:if="${isLogin}" class="d-flex">
         <button class="btn btn-outline-dark" type="submit">
