@@ -24,7 +24,7 @@
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-        <li th:if="${isLogin == null || !isLogin}" class="nav-item"><a class="nav-link" href="/login">로그인</a></li>
+        <li th:if="${isLogin == null || !isLogin}" class="nav-item"><a class="nav-link" href="/member/login">로그인</a></li>
         <li th:if="${isLogin == null || !isLogin}" class="nav-item"><a class="nav-link" href="/member/register">회원가입</a></li>
         <li th:if="${isLogin}" class="nav-item"><a class="nav-link" href="/member/myInfo">내정보</a></li>
         <li th:if="${isLogin}" class="nav-item"><a class="nav-link" href="#">주문내역</a></li>

@@ -1,4 +1,4 @@
-package park.shop.web.argumentresolver;
+package park.shop.web.util.argumentresolver;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

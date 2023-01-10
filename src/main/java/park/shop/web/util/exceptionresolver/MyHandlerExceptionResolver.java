@@ -1,4 +1,4 @@
-package park.shop.web.exceptionresolver;
+package park.shop.web.util.exceptionresolver;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.HandlerExceptionResolver;

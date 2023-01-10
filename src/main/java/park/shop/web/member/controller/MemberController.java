@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import park.shop.common.SessionConst;
 import park.shop.domain.member.GenderType;
 import park.shop.domain.member.Member;
-import park.shop.web.argumentresolver.Login;
+import park.shop.web.util.argumentresolver.Login;
 import park.shop.web.member.dto.MemberInfoDto;
 import park.shop.web.member.dto.MemberLoginDto;
 import park.shop.web.member.dto.MemberRegisterDto;
@@ -68,6 +68,12 @@ public class MemberController {
         return "register";
     }
 
+    @RequestMapping("/login")
+    public String login(Model model) {
+        model.addAttribute("login", new MemberLoginDto());
+        return "login";
+    }
+
     @PostMapping("/login")
     public String login(
             @Validated @ModelAttribute("login") MemberLoginDto memberLoginDto,
@@ -90,6 +96,8 @@ public class MemberController {
         //세션 생성
         HttpSession session = request.getSession(true);
         session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
+
+        log.info("왜 앙대? : {}", redirectURL);
 
         return "redirect:" + redirectURL;
     }

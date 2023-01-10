@@ -22,7 +22,7 @@
 <body>
 <div class="login-div">
     <h2>로그인</h2>
-    <form th:object="${login}" action="/member/login" method="post" onsubmit="return onSubmitEvent(this)">
+    <form th:object="${login}" th:action method="post" onsubmit="return onSubmitEvent(this)">
         <!-- ID input -->
         <div class="form-group col-md-12">
             <label for="loginId">아이디</label>

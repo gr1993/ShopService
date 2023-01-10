@@ -1,4 +1,4 @@
-package park.shop.web.argumentresolver;
+package park.shop.web.util.argumentresolver;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
