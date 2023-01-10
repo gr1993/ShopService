@@ -3,13 +3,21 @@ package park.shop.web.home;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import park.shop.domain.member.Member;
+import park.shop.web.argumentresolver.Login;
 import park.shop.web.member.dto.MemberLoginDto;
 
 @Controller
 public class HomeController {
 
     @RequestMapping("/")
-    public String home() {
+    public String home(@Login Member member, Model model) {
+        if(member == null) {
+            model.addAttribute("isLogin", false);
+        } else {
+            model.addAttribute("isLogin", true);
+        }
+
         return "index";
     }
 
