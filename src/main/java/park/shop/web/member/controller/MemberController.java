@@ -97,8 +97,6 @@ public class MemberController {
         HttpSession session = request.getSession(true);
         session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
 
-        log.info("왜 앙대? : {}", redirectURL);
-
         return "redirect:" + redirectURL;
     }
 
@@ -118,7 +116,7 @@ public class MemberController {
         memberInfoDto.setName(member.getName());
         memberInfoDto.setAddress(member.getAddress());
         memberInfoDto.setGender(GenderType.valueOf(member.getGender()));
-        memberInfoDto.setCreateDt(member.getCreateDt().toString().replace('T', ' '));
+        memberInfoDto.setCreateDt(member.getCreateDt());
 
         model.addAttribute("member", memberInfoDto);
         return "myInfo";

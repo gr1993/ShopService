@@ -6,6 +6,7 @@ import park.shop.domain.member.GenderType;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 
 @Setter
 @Getter
@@ -26,5 +27,5 @@ public class MemberInfoDto {
 
     private GenderType gender;
 
-    private String createDt;
+    private LocalDateTime createDt;
 }

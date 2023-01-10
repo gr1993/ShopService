@@ -1,12 +1,14 @@
 package park.shop;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import park.shop.web.util.argumentresolver.LoginMemberArgumentResolver;
 import park.shop.web.util.exceptionresolver.MyHandlerExceptionResolver;
+import park.shop.web.util.formatter.LocalDateTimeFormatter;
 import park.shop.web.util.interceptor.LoginCheckInterceptor;
 
 import java.util.List;
@@ -25,6 +27,11 @@ public class WebConfig implements WebMvcConfigurer {
                 .order(1)
                 .addPathPatterns("/**")
                 .excludePathPatterns("/", "/login", "/member/register", "/member/login", "/member/logout", "/img/**", "/css/**", "/assets/**", "/*.ico", "/error/**");
+    }
+
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        registry.addFormatter(new LocalDateTimeFormatter());
     }
 
     @Override
