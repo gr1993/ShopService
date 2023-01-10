@@ -1,10 +1,19 @@
 <!DOCTYPE html>
-<html th:replace="~{layout/homeLayout :: layout(~{::title},~{::section})}"
+<html th:replace="~{layout/homeLayout :: layout(~{::title},~{::header},~{::section})}"
         xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>박신사 스토어</title>
 </head>
 <body>
+<!-- Header-->
+<header class="bg-dark py-5">
+    <div class="container px-4 px-lg-5 my-5">
+        <div class="text-center text-white">
+            <h1 class="display-4 fw-bolder">최저가 세일! 박신사</h1>
+            <p class="lead fw-normal text-white-50 mb-0">오늘의 세일 상품도 놓치지 마세요!</p>
+        </div>
+    </div>
+</header>
 <!-- Section-->
 <section class="py-5">
     <div class="container px-4 px-lg-5 mt-5">

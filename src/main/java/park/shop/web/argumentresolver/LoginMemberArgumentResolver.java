@@ -29,6 +29,7 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
             return null;
         }
 
+        request.setAttribute("isLogin", true);
         return session.getAttribute(SessionConst.LOGIN_MEMBER);
     }
 }

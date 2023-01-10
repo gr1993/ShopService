@@ -12,12 +12,6 @@ public class HomeController {
 
     @RequestMapping("/")
     public String home(@Login Member member, Model model) {
-        if(member == null) {
-            model.addAttribute("isLogin", false);
-        } else {
-            model.addAttribute("isLogin", true);
-        }
-
         return "index";
     }
 

@@ -3,12 +3,15 @@ package park.shop.web.member.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import park.shop.common.util.EncryptUtil;
 import park.shop.domain.common.IsDeleteType;
 import park.shop.domain.member.LoginType;
 import park.shop.domain.member.Member;
 import park.shop.domain.member.RoleType;
 import park.shop.repository.member.MemberRepository;
+import park.shop.repository.member.MemberUpdateDto;
+import park.shop.web.member.dto.MemberInfoDto;
 import park.shop.web.member.dto.MemberRegisterDto;
 
 import java.util.Optional;
@@ -55,5 +58,33 @@ public class MemberService {
             return null;
         }
         return findMember;
+    }
+
+    public void updateMember(Long id, MemberInfoDto memberInfoDto) {
+        MemberUpdateDto updateDto = new MemberUpdateDto();
+        Member findMember = memberRepository.findById(id).orElse(null);
+
+        if (findMember == null) {
+            throw new IllegalStateException();
+        }
+
+        if (StringUtils.hasText(memberInfoDto.getPassword())) {
+            String pwd = memberInfoDto.getPassword();
+            String salt = EncryptUtil.getSalt();
+            String encryptedPwd = EncryptUtil.getEncrypt(pwd, salt);
+            updateDto.setPassword(encryptedPwd);
+            updateDto.setSalt(salt);
+        } else {
+            updateDto.setPassword(findMember.getPassword());
+            updateDto.setSalt(findMember.getSalt());
+        }
+
+        updateDto.setName(memberInfoDto.getName());
+        updateDto.setGender(memberInfoDto.getGender());
+        updateDto.setAddress(memberInfoDto.getAddress());
+        updateDto.setRole(findMember.getRole());
+        updateDto.setIsDelete(findMember.getIsDelete());
+
+        memberRepository.update(id, updateDto);
     }
 }

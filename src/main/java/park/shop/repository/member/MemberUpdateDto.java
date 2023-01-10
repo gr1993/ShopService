@@ -9,6 +9,8 @@ import park.shop.domain.member.GenderType;
 public class MemberUpdateDto {
     private String password;
 
+    private String salt;
+
     private String name;
 
     private GenderType gender;

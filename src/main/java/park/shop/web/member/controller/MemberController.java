@@ -8,17 +8,16 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import park.shop.common.CookieConst;
 import park.shop.common.SessionConst;
 import park.shop.domain.member.GenderType;
 import park.shop.domain.member.Member;
+import park.shop.web.argumentresolver.Login;
+import park.shop.web.member.dto.MemberInfoDto;
 import park.shop.web.member.dto.MemberLoginDto;
 import park.shop.web.member.dto.MemberRegisterDto;
 import park.shop.web.member.service.MemberService;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @Slf4j
@@ -74,8 +73,7 @@ public class MemberController {
             @Validated @ModelAttribute("login") MemberLoginDto memberLoginDto,
             BindingResult bindingResult,
             @RequestParam(defaultValue = "/") String redirectURL,
-            HttpServletRequest request,
-            HttpServletResponse response
+            HttpServletRequest request
     ) {
         if(bindingResult.hasErrors()) {
             log.info("errors = {}", bindingResult);
@@ -95,4 +93,57 @@ public class MemberController {
 
         return "redirect:" + redirectURL;
     }
+
+    @GetMapping("/myInfo")
+    public String myInfoForm(@Login Member member, Model model) {
+        MemberInfoDto memberInfoDto = new MemberInfoDto();
+        memberInfoDto.setLoginId(member.getLoginId());
+        memberInfoDto.setName(member.getName());
+        memberInfoDto.setAddress(member.getAddress());
+        memberInfoDto.setGender(GenderType.valueOf(member.getGender()));
+        memberInfoDto.setCreateDt(member.getCreateDt().toString().replace('T', ' '));
+
+        model.addAttribute("member", memberInfoDto);
+        return "myInfo";
+    }
+
+    @PostMapping("/myInfo")
+    public String myInfo(
+            @Login Member member,
+            @Validated @ModelAttribute("member") MemberInfoDto memberInfoDto,
+            BindingResult bindingResult,
+            Model model
+    ) {
+        if (memberInfoDto.getPassword() == null && memberInfoDto.getPasswordCheck() != null) {
+            bindingResult.addError(new FieldError("member", "password", null, false, new String[] {"NotBlank.member.password"}, null, null));
+        }
+        if (memberInfoDto.getPassword() != null && memberInfoDto.getPasswordCheck() == null) {
+            bindingResult.addError(new FieldError("member", "passwordCheck", null, false, new String[] {"NotBlank.member.passwordCheck"}, null, null));
+        }
+
+        if (memberInfoDto.getPassword() != null && memberInfoDto.getPasswordCheck() != null) {
+            //비밀번호 6~20자리 확인
+            if (memberInfoDto.getPassword().length() < 6 || memberInfoDto.getPassword().length() > 20) {
+                bindingResult.addError(new FieldError("member", "password", null, false, new String[] {"Size"}, new Object[] {0, 6, 20}, null));
+            }
+            //비밀번호 확인 6~20자리 확인
+            if (memberInfoDto.getPasswordCheck().length() < 6 || memberInfoDto.getPasswordCheck().length() > 20) {
+                bindingResult.addError(new FieldError("member", "passwordCheck", null, false, new String[] {"Size"}, new Object[] {0, 6, 20}, null));
+            }
+            //비밀번호와 확인이 일치하는지 확인
+            if (!memberInfoDto.getPassword().equals(memberInfoDto.getPasswordCheck())) {
+                bindingResult.addError(new FieldError("member", "passwordCheck", null, false, new String[] {"NotExact.member.passwordCheck"}, null, null));
+            }
+        }
+
+        if (bindingResult.hasErrors()) {
+            log.info("errors = {}", bindingResult);
+            return "myInfo";
+        }
+
+        memberService.updateMember(member.getId(), memberInfoDto);
+        model.addAttribute("isSuccess", true);
+        return "myInfo";
+    }
+
 }

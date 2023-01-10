@@ -38,6 +38,7 @@ public class MemberRepositoryImpl implements MemberRepository{
     public void update(Long memberId, MemberUpdateDto updateDto) {
         Member findMember = em.find(Member.class, memberId);
         findMember.setPassword(updateDto.getPassword());
+        findMember.setSalt(updateDto.getSalt());
         findMember.setName(updateDto.getName());
         findMember.setGender(updateDto.getGender().toString());
         findMember.setAddress(updateDto.getAddress());
