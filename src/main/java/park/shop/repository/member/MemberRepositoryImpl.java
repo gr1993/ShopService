@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import park.shop.domain.member.Member;
+import park.shop.repository.member.jpa.SDJpaMemberRepository;
 
 import javax.persistence.EntityManager;
 import java.util.List;
@@ -13,14 +14,16 @@ import java.util.Optional;
 
 import static park.shop.domain.member.QMember.member;
 
-@Transactional
 @Repository
+@Transactional
 public class MemberRepositoryImpl implements MemberRepository{
+    private SDJpaMemberRepository sdJpaMemberRepository;
 
     private final EntityManager em;
     private final JPAQueryFactory query;
 
-    public MemberRepositoryImpl(EntityManager em) {
+    public MemberRepositoryImpl(SDJpaMemberRepository sdJpaMemberRepository, EntityManager em) {
+        this.sdJpaMemberRepository = sdJpaMemberRepository;
         this.em = em;
         this.query = new JPAQueryFactory(em);
     }
@@ -45,6 +48,12 @@ public class MemberRepositoryImpl implements MemberRepository{
     @Override
     public Optional<Member> findById(Long id) {
         Member member = em.find(Member.class, id);
+        return Optional.ofNullable(member);
+    }
+
+    @Override
+    public Optional<Member> findByLoginId(String loginId) {
+        Member member = sdJpaMemberRepository.findByLoginId(loginId);
         return Optional.ofNullable(member);
     }
 

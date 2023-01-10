@@ -3,12 +3,15 @@ package park.shop.web.member.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import park.shop.common.util.EncryptUtil;
 import park.shop.domain.common.IsDeleteType;
 import park.shop.domain.member.LoginType;
 import park.shop.domain.member.Member;
 import park.shop.domain.member.RoleType;
 import park.shop.repository.member.MemberRepository;
 import park.shop.web.member.dto.MemberRegisterDto;
+
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -17,10 +20,20 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
 
+    public Optional<Member> findByLoginId(String loginId) {
+        return memberRepository.findByLoginId(loginId);
+    }
+
     public void registerMember(MemberRegisterDto memberRegisterDto) {
         Member member = new Member();
         member.setLoginId(memberRegisterDto.getLoginId());
-        member.setPassword(memberRegisterDto.getPassword());
+
+        String pwd = memberRegisterDto.getPassword();
+        String salt = EncryptUtil.getSalt();
+        String encryptedPwd = EncryptUtil.getEncrypt(pwd, salt);
+        member.setPassword(encryptedPwd);
+        member.setSalt(salt);
+
         member.setLoginType(LoginType.WEB.toString());
         member.setName(memberRegisterDto.getName());
         member.setGender(memberRegisterDto.getGender().toString());
@@ -29,5 +42,18 @@ public class MemberService {
         member.setIsDelete(IsDeleteType.N.toString());
 
         memberRepository.save(member);
+    }
+
+    public Member login(String loginId, String password) {
+        Member findMember = memberRepository.findByLoginId(loginId).orElse(null);
+        if(findMember == null) {
+            return null;
+        }
+
+        String encryptedPwd = EncryptUtil.getEncrypt(password, findMember.getSalt());
+        if (!encryptedPwd.equals(findMember.getPassword())) {
+            return null;
+        }
+        return findMember;
     }
 }

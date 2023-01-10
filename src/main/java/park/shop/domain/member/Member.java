@@ -18,6 +18,9 @@ public class Member {
     @NotNull @Column(length = 250)
     private String password;
 
+    @NotNull @Column(length = 50)
+    private String salt;
+
     @Column(name = "login_type", length = 20)
     private String loginType;
 

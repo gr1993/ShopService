@@ -3,11 +3,14 @@ package park.shop.repository.member;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
+import park.shop.common.util.EncryptUtil;
 import park.shop.domain.member.GenderType;
 import park.shop.domain.member.Member;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -39,19 +42,20 @@ class MemberRepositoryImplTest {
         Long memberId = savedMember.getId();
 
         //when
+        Member updateMember = createDumpMember("2", GenderType.F);
         MemberUpdateDto updateDto = new MemberUpdateDto();
-        updateDto.setAddress("주소2");
+        updateDto.setAddress(updateMember.getAddress());
         updateDto.setGender(GenderType.F);
-        updateDto.setPassword("test2");
-        updateDto.setName("박강린2");
-        updateDto.setRole("판매자");
+        updateDto.setPassword(updateMember.getPassword());
+        updateDto.setName(updateMember.getName());
+        updateDto.setRole(updateMember.getRole());
         updateDto.setIsDelete("A");
         memberRepository.update(memberId, updateDto);
 
         //then
         Member findMember = memberRepository.findById(savedMember.getId()).get();
         assertThat(findMember.getAddress()).isEqualTo(updateDto.getAddress());
-        assertThat(findMember.getGender()).isEqualTo(updateDto.getGender());
+        assertThat(findMember.getGender()).isEqualTo(updateDto.getGender().toString());
         assertThat(findMember.getPassword()).isEqualTo(updateDto.getPassword());
         assertThat(findMember.getName()).isEqualTo(updateDto.getName());
         assertThat(findMember.getRole()).isEqualTo(updateDto.getRole());
@@ -85,6 +89,24 @@ class MemberRepositoryImplTest {
         findTest("test3", "박강림3", member3);
     }
 
+    @Test
+    void findByLoginId () {
+        //given
+        Member member1 = createDumpMember("1", GenderType.M);
+        Member member2 = createDumpMember("2", GenderType.F);
+        Member member3 = createDumpMember("3", GenderType.M);
+
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+        memberRepository.save(member3);
+
+        //when
+        Member findMember = memberRepository.findByLoginId("test1").orElse(null);
+
+        //then
+        assertThat(findMember).isEqualTo(member1);
+    }
+
     void findTest(String loginId, String name, Member... members) {
         List<Member> result = memberRepository.findAll(new MemberSearchCond(loginId, name));
         assertThat(result).containsExactly(members);
@@ -93,7 +115,11 @@ class MemberRepositoryImplTest {
     Member createDumpMember(String addText, GenderType gender) {
         Member member = new Member();
         member.setLoginId("test" + addText);
-        member.setPassword("pw" + addText);
+        String pwd = "pw" + addText;
+        String salt = EncryptUtil.getSalt();
+        String encryptedPwd = EncryptUtil.getEncrypt(pwd, salt);
+        member.setPassword(encryptedPwd);
+        member.setSalt(salt);
         member.setName("박강림" + addText);
         member.setRole("일반" + addText);
         member.setGender(gender.toString());
