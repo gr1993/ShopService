@@ -80,25 +80,25 @@
       <div class="product-searchbox-row">
         <!-- 상품명 검색 -->
         <div class="product-searchbox-field-container">
-          <label for="staticEmail" class="product-searchbox-field-item-name col-form-label text-center">상품명</label>
+          <label for="searchName" class="product-searchbox-field-item-name col-form-label text-center">상품명</label>
           <div class="product-searchbox-field-item-value">
-            <input type="text" class="form-control" id="staticEmail" value="email@example.com">
+            <input type="text" class="form-control" id="searchName">
           </div>
         </div>
 
         <!-- 가격 검색 -->
         <div class="product-searchbox-field-container">
-          <label for="staticEmail" class="product-searchbox-field-item-name col-form-label text-center">가격</label>
+          <label for="searchPrice" class="product-searchbox-field-item-name col-form-label text-center">가격</label>
           <div class="product-searchbox-field-item-value">
-            <input type="number" class="form-control" id="staticEmail" value="email@example.com">
+            <input type="number" class="form-control" id="searchPrice">
           </div>
         </div>
 
         <!-- 수량 검색 -->
         <div class="product-searchbox-field-container">
-          <label for="staticEmail" class="product-searchbox-field-item-name col-form-label text-center">수량</label>
+          <label for="searchQuantity" class="product-searchbox-field-item-name col-form-label text-center">수량</label>
           <div class="product-searchbox-field-item-value">
-            <input type="number" class="form-control" id="staticEmail" value="email@example.com">
+            <input type="number" class="form-control" id="searchQuantity">
           </div>
         </div>
       </div>
@@ -204,60 +204,109 @@
           <div class="modal-body">
             <!-- 상품명 입력 -->
             <div class="product-modal-row">
-              <label for="staticEmail" class="product-modal-field-item-name col-form-label text-center">상품명</label>
+              <label for="registerName" class="product-modal-field-item-name col-form-label text-center">상품명</label>
               <div class="product-modal-field-item-value">
-                <input type="text" class="form-control" id="staticEmail" value="email@example.com">
+                <input type="text" class="form-control" id="registerName">
               </div>
             </div>
 
             <!-- 가격 입력 -->
             <div class="product-modal-row">
-              <label for="staticEmail" class="product-modal-field-item-name col-form-label text-center">가격</label>
+              <label for="registerPrice" class="product-modal-field-item-name col-form-label text-center">가격</label>
               <div class="product-modal-field-item-value">
-                <input type="number" class="form-control" id="staticEmail" value="email@example.com">
+                <input type="number" class="form-control" id="registerPrice">
               </div>
             </div>
 
             <!-- 세일 가격 입력 -->
             <div class="product-modal-row">
-              <label for="staticEmail" class="product-modal-field-item-name col-form-label text-center">세일 가격</label>
+              <label for="registerSalePrice" class="product-modal-field-item-name col-form-label text-center">세일 가격</label>
               <div class="product-modal-field-item-value">
-                <input type="number" class="form-control" id="staticEmail" value="email@example.com">
+                <input type="number" class="form-control" id="registerSalePrice">
               </div>
             </div>
 
             <!-- 수량 입력 -->
             <div class="product-modal-row">
-              <label for="staticEmail" class="product-modal-field-item-name col-form-label text-center">수량</label>
+              <label for="registerQuantity" class="product-modal-field-item-name col-form-label text-center">수량</label>
               <div class="product-modal-field-item-value">
-                <input type="number" class="form-control" id="staticEmail" value="email@example.com">
+                <input type="number" class="form-control" id="registerQuantity">
               </div>
             </div>
 
             <!-- 대표이미지 입력 -->
             <div class="product-modal-row">
-              <label for="staticEmail" class="product-modal-field-item-name col-form-label text-center">대표 이미지</label>
+              <label for="registerMainImage" class="product-modal-field-item-name col-form-label text-center">대표 이미지</label>
               <div class="product-modal-field-item-value">
-                <input type="file" class="form-control-file" id="staticEmail" value="email@example.com">
+                <input type="file" class="form-control-file" id="registerMainImage">
               </div>
             </div>
 
             <!-- 상세이미지 입력 -->
             <div class="product-modal-row">
-              <label for="staticEmail" class="product-modal-field-item-name col-form-label text-center">상세 이미지</label>
+              <label for="registerDescImageGroup" class="product-modal-field-item-name col-form-label text-center">상세 이미지</label>
               <div class="product-modal-field-item-value">
-                <input type="file" class="form-control-file" id="staticEmail" value="email@example.com">
+                <input type="file" class="form-control-file" id="registerDescImageGroup" multiple>
               </div>
             </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-            <button type="button" class="btn btn-primary">등록</button>
+            <button type="button" class="btn btn-primary" id="productRegister" onclick="productRegister()">등록</button>
           </div>
         </div>
       </div>
     </div>
   </div>
+  <script th:inline="javascript">
+    //상품 등록 함수
+    function productRegister () {
+      if(!confirm([[#{product.register}]])) {
+        return;
+      }
+
+      const nameInput = $("#registerName")[0];
+      const priceInput = $("#registerPrice")[0];
+      const salePriceInput = $("#registerSalePrice")[0];
+      const quantityInput = $("#registerQuantity")[0];
+      const mainImageInput = $("#registerMainImage")[0];
+      const descImageGroupInput = $("#registerDescImageGroup")[0];
+
+      const formData = new FormData();
+      formData.append('name', nameInput.value);
+      formData.append('price', priceInput.value);
+      formData.append('salePrice', salePriceInput.value);
+      formData.append('quantity', quantityInput.value);
+      if (mainImageInput.files.length > 0) {
+        formData.append('mainImage', mainImageInput.files[0]);
+      }
+      if (descImageGroupInput.files.length > 0) {
+        for(var index = 0; index < descImageGroupInput.files.length; index++) {
+          formData.append('descImageGroup', descImageGroupInput.files[index]);
+        }
+      }
+
+      $.ajax({
+        type:"POST",
+        url: "/product/register",
+        processData: false,
+        contentType: false,
+        data: formData,
+        success: function(res) {
+          console.log(res);
+          if (res.success) {
+            alert([[#{product.register.complete}]]);
+            $('#insertModal').modal('hide');
+          } else {
+            alert(res.message);
+          }
+        },
+        err: function(err) {
+          alert([[#{product.register.fail}]]);
+        }
+      })
+    }
+  </script>
 </section>
 </body>
 </html>

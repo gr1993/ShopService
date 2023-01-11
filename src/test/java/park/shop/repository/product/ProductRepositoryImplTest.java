@@ -72,6 +72,17 @@ class ProductRepositoryImplTest {
         assertThat(savedProduct).isEqualTo(product);
     }
 
+    @Test
+    void find() {
+//        Product product = productRepository.findById(4L).orElse(null);
+//        log.info("product={}", product.getId());
+//        log.info("member={}", product.getMember().getId());
+//        log.info("mainImage={}", product.getMainImage().getId());
+//        log.info("mainImageName={}", product.getMainImage().getName());
+//        log.info("descImageGroup={}", product.getDescImageGroup().getId());
+//        log.info("descImageGroupFiles={}", product.getDescImageGroup().getFiles().size());
+    }
+
     Member createDumpMember(String addText, GenderType gender) {
         Member member = new Member();
         member.setLoginId("test" + addText);

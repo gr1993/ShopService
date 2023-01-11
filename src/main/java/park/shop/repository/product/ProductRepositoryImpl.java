@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import park.shop.domain.product.Product;
 
 import javax.persistence.EntityManager;
+import java.util.Optional;
 
 @Repository
 @Transactional
@@ -23,5 +24,11 @@ public class ProductRepositoryImpl implements ProductRepository {
     public Product save(Product product) {
         em.persist(product);
         return product;
+    }
+
+    @Override
+    public Optional<Product> findById(Long id) {
+        Product product = em.find(Product.class, id);
+        return Optional.ofNullable(product);
     }
 }

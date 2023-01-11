@@ -4,6 +4,8 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Entity(name = "file_group")
@@ -18,6 +20,9 @@ public class FileGroup {
 
     @Column
     private LocalDateTime updateDt;
+
+    @OneToMany(mappedBy = "fileGroup")
+    private List<File> files = new ArrayList<>();
 
     public FileGroup() {
     }
