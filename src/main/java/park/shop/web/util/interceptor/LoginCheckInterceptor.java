@@ -25,6 +25,8 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
             response.sendRedirect("/member/login?redirectURL=" + requestURI);
             return false;
         }
+
+        request.setAttribute("isLogin", true);
         return true;
     }
 }

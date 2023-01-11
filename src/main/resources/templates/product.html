@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html th:replace="~{layout/homeLayout :: layout(~{::title},~{::header},~{::section})}"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>박신사 - 내정보</title>
+</head>
+<body>
+<!-- Header-->
+<header>
+</header>
+<!-- Section-->
+<section>
+  <style>
+      .product-container {
+          padding: 20px;
+          width: 1000px;
+      }
+      .product-row {
+          margin: 10px 0px;
+      }
+
+      .product-searchbox {
+          border: 1px solid gray;
+          border-radius: 5px;
+      }
+      .product-searchbox-row {
+          margin: 10px 5px;
+          display: flex;
+          flex-direction: row;
+      }
+      .product-searchbox-btn-row {
+          margin: 5px 5px;
+          display: flex;
+          justify-content: flex-end;
+      }
+      .product-searchbox-field-container {
+          display: flex;
+          flex-direction: row;
+          width: 30%;
+      }
+      .product-searchbox-field-item-name {
+          width: 30%;
+      }
+      .product-searchbox-field-item-value {
+          width: 70%;
+      }
+
+      .product-btn-container {
+          display: flex;
+          flex-direction: row;
+          justify-content: flex-end;
+      }
+      .product-btn-item {
+          margin: 0px 4px;
+      }
+
+      .product-pagination-container {
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+      }
+
+      .product-modal-row {
+          margin: 10px;
+          display: flex;
+          flex-direction: row;
+      }
+      .product-modal-field-item-name {
+          width: 30%;
+      }
+      .product-modal-field-item-value {
+          width: 70%;
+      }
+  </style>
+  <div class="product-container">
+    <div class="product-row" style="margin-bottom: 20px;">
+      <h3>내 판매 상품</h3>
+    </div>
+    <div class="product-row product-searchbox">
+      <div class="product-searchbox-row">
+        <!-- 상품명 검색 -->
+        <div class="product-searchbox-field-container">
+          <label for="staticEmail" class="product-searchbox-field-item-name col-form-label text-center">상품명</label>
+          <div class="product-searchbox-field-item-value">
+            <input type="text" class="form-control" id="staticEmail" value="email@example.com">
+          </div>
+        </div>
+
+        <!-- 가격 검색 -->
+        <div class="product-searchbox-field-container">
+          <label for="staticEmail" class="product-searchbox-field-item-name col-form-label text-center">가격</label>
+          <div class="product-searchbox-field-item-value">
+            <input type="number" class="form-control" id="staticEmail" value="email@example.com">
+          </div>
+        </div>
+
+        <!-- 수량 검색 -->
+        <div class="product-searchbox-field-container">
+          <label for="staticEmail" class="product-searchbox-field-item-name col-form-label text-center">수량</label>
+          <div class="product-searchbox-field-item-value">
+            <input type="number" class="form-control" id="staticEmail" value="email@example.com">
+          </div>
+        </div>
+      </div>
+      <div class="product-searchbox-btn-row">
+        <button type="button" class="btn btn-secondary product-btn-item">검색</button>
+      </div>
+    </div>
+    <div class="product-row">
+      <div class="product-btn-container">
+        <button type="button" class="btn btn-primary product-btn-item" data-bs-toggle="modal" data-bs-target="#insertModal">등록</button>
+        <button type="button" class="btn btn-success product-btn-item">수정</button>
+        <button type="button" class="btn btn-danger product-btn-item">삭제</button>
+      </div>
+    </div>
+    <div class="product-row" style="height:400px;">
+      <table class="table table-bordered">
+        <thead class="table-dark">
+        <tr>
+          <th class="text-center" scope="col">선택</th>
+          <th scope="col">대표 이미지</th>
+          <th scope="col">상품명</th>
+          <th scope="col">가격</th>
+          <th scope="col">세일 가격</th>
+          <th scope="col">수량</th>
+          <th scope="col">등록일</th>
+          <th scope="col">수정일</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td class="text-center"><input type="checkbox"></td>
+          <td><img src=""></td>
+          <td>땍뚜 머신</td>
+          <td>1,000</td>
+          <td>500</td>
+          <td>80</td>
+          <td>2000-12-12 01:10:10</td>
+          <td>2000-12-12 01:10:10</td>
+        </tr>
+        <tr>
+          <td class="text-center"><input type="checkbox"></td>
+          <td><img src=""></td>
+          <td>땍뚜 머신</td>
+          <td>1,000</td>
+          <td>500</td>
+          <td>80</td>
+          <td>2000-12-12 01:10:10</td>
+          <td>2000-12-12 01:10:10</td>
+        </tr>
+        <tr>
+          <td class="text-center"><input type="checkbox"></td>
+          <td><img src=""></td>
+          <td>땍뚜 머신</td>
+          <td>1,000</td>
+          <td>500</td>
+          <td>80</td>
+          <td>2000-12-12 01:10:10</td>
+          <td>2000-12-12 01:10:10</td>
+        </tr>
+        <tr>
+          <td class="text-center"><input type="checkbox"></td>
+          <td><img src=""></td>
+          <td>땍뚜 머신</td>
+          <td>1,000</td>
+          <td>500</td>
+          <td>80</td>
+          <td>2000-12-12 01:10:10</td>
+          <td>2000-12-12 01:10:10</td>
+        </tr>
+        <tr>
+          <td class="text-center"><input type="checkbox"></td>
+          <td><img src=""></td>
+          <td>땍뚜 머신</td>
+          <td>1,000</td>
+          <td>500</td>
+          <td>80</td>
+          <td>2000-12-12 01:10:10</td>
+          <td>2000-12-12 01:10:10</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="product-row product-pagination-container">
+      <nav aria-label="Page navigation example">
+        <ul class="pagination">
+          <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+          <li class="page-item"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+          <li class="page-item"><a class="page-link" href="#">Next</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- 등록 모달 -->
+    <div class="modal fade" id="insertModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">상품 등록</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <!-- 상품명 입력 -->
+            <div class="product-modal-row">
+              <label for="staticEmail" class="product-modal-field-item-name col-form-label text-center">상품명</label>
+              <div class="product-modal-field-item-value">
+                <input type="text" class="form-control" id="staticEmail" value="email@example.com">
+              </div>
+            </div>
+
+            <!-- 가격 입력 -->
+            <div class="product-modal-row">
+              <label for="staticEmail" class="product-modal-field-item-name col-form-label text-center">가격</label>
+              <div class="product-modal-field-item-value">
+                <input type="number" class="form-control" id="staticEmail" value="email@example.com">
+              </div>
+            </div>
+
+            <!-- 세일 가격 입력 -->
+            <div class="product-modal-row">
+              <label for="staticEmail" class="product-modal-field-item-name col-form-label text-center">세일 가격</label>
+              <div class="product-modal-field-item-value">
+                <input type="number" class="form-control" id="staticEmail" value="email@example.com">
+              </div>
+            </div>
+
+            <!-- 수량 입력 -->
+            <div class="product-modal-row">
+              <label for="staticEmail" class="product-modal-field-item-name col-form-label text-center">수량</label>
+              <div class="product-modal-field-item-value">
+                <input type="number" class="form-control" id="staticEmail" value="email@example.com">
+              </div>
+            </div>
+
+            <!-- 대표이미지 입력 -->
+            <div class="product-modal-row">
+              <label for="staticEmail" class="product-modal-field-item-name col-form-label text-center">대표 이미지</label>
+              <div class="product-modal-field-item-value">
+                <input type="file" class="form-control-file" id="staticEmail" value="email@example.com">
+              </div>
+            </div>
+
+            <!-- 상세이미지 입력 -->
+            <div class="product-modal-row">
+              <label for="staticEmail" class="product-modal-field-item-name col-form-label text-center">상세 이미지</label>
+              <div class="product-modal-field-item-value">
+                <input type="file" class="form-control-file" id="staticEmail" value="email@example.com">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            <button type="button" class="btn btn-primary">등록</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>
