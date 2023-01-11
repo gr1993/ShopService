@@ -108,7 +108,7 @@
         </div>
       </div>
       <div class="product-searchbox-btn-row">
-        <button type="button" class="btn btn-secondary product-btn-item" onclick="searchProduct()">검색</button>
+        <button type="button" class="btn btn-secondary product-btn-item" onclick="searchBtnClick()">검색</button>
       </div>
     </div>
     <div class="product-row">
@@ -139,12 +139,7 @@
     </div>
     <div class="product-row product-pagination-container">
       <nav aria-label="Page navigation example">
-        <ul class="pagination">
-          <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-          <li class="page-item"><a class="page-link" href="#">1</a></li>
-          <li class="page-item"><a class="page-link" href="#">2</a></li>
-          <li class="page-item"><a class="page-link" href="#">3</a></li>
-          <li class="page-item"><a class="page-link" href="#">Next</a></li>
+        <ul class="pagination" id="productPagination">
         </ul>
       </nav>
     </div>
@@ -215,42 +210,33 @@
     </div>
   </div>
   <script th:inline="javascript">
-    //검색 함수
-    function searchProduct() {
-      let param = '';
-      let isFirst = true;
+    //한 페이지에 3개 씩 출력
+    const pageSize = 3;
 
+    //검색 버튼 클릭 이벤트
+    function searchBtnClick() {
+        searchProduct(1);
+    }
+
+    //검색 함수
+    function searchProduct(page) {
+      //페이지네이션 파라미터 적용
+      let param = `?pageSize=${pageSize}&page=${page}`;
+
+      //이름 검색 필터 파라미터
       const name = $("#searchName")[0].value;
       if(name) {
-        if(isFirst) {
-          param += "?";
-          isFirst = false;
-        } else {
-          param += "&";
-        }
-        param += `name=${name}`;
+        param += `&name=${name}`;
       }
-
+      //가격 검색 필터 파라미터
       const price = $("#searchPrice")[0].value;
       if(price) {
-        if(isFirst) {
-          param += "?";
-          isFirst = false;
-        } else {
-          param += "&";
-        }
-        param += `price=${price}`;
+        param += `&price=${price}`;
       }
-
-      const salePrice = $("#searchQuantity")[0].value;
-      if(salePrice) {
-        if(isFirst) {
-          param += "?";
-          isFirst = false;
-        } else {
-          param += "&";
-        }
-        param += `salePrice=${salePrice}`;
+      //수량 검색 필터 파라미터
+      const quantity = $("#searchQuantity")[0].value;
+      if(quantity) {
+        param += `&quantity=${quantity}`;
       }
 
       $.ajax({
@@ -276,11 +262,47 @@
                 `
             }
 
+            //테이블에 데이터 표시
             const table = $("#productTableBody")[0];
             table.innerHTML = template;
+
+            //페이지네이션 적용
+            setPagination(res.totalCount, page);
           }
         }
       })
+    }
+
+    //페이지네이션 셋팅
+    function setPagination(totalCount, page) {
+      const isPageAdd = (totalCount % pageSize) != 0;
+      const totalPage = Math.floor(totalCount / pageSize) + (isPageAdd ? 1 : 0);
+
+      let template = '';
+      template += '<li class="page-item" onclick="pageClickEvent(1)"><a class="page-link" href="#">시작</a></li>';
+
+      const currentPage = page;
+      //3페이지까지는 1부터 표시하나 4부터는 (현재 페이지 -2)페이지부터 표시
+      page = page > 3 ? page - 2 : 1;
+
+      for(var index = page; index < page + 5; index++) {
+        if (index == currentPage) {
+          template += `<li class="page-item active" onclick="pageClickEvent(${index})"><a class="page-link" href="#">${index}</a></li>`;
+        }
+        else if(index <= totalPage) {
+          template += `<li class="page-item" onclick="pageClickEvent(${index})"><a class="page-link" href="#">${index}</a></li>`;
+        }
+      }
+
+      template += `<li class="page-item" onclick="pageClickEvent(${totalPage})"><a class="page-link" href="#">끝</a></li>`;
+
+      const pagination = $("#productPagination")[0];
+      pagination.innerHTML = template;
+    }
+
+    //페이지 클릭 이벤트
+    function pageClickEvent(page) {
+      searchProduct(page);
     }
 
     //상품 등록 함수
@@ -317,7 +339,6 @@
         contentType: false,
         data: formData,
         success: function(res) {
-          console.log(res);
           if (res.success) {
             alert([[#{product.register.complete}]]);
             $('#insertModal').modal('hide');

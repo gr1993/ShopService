@@ -4,15 +4,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 import park.shop.common.dto.Pageable;
 import park.shop.common.util.EncryptUtil;
+import park.shop.domain.file.File;
+import park.shop.domain.file.FileGroup;
 import park.shop.domain.member.GenderType;
 import park.shop.domain.member.Member;
 import park.shop.domain.product.Product;
-import park.shop.domain.file.File;
-import park.shop.domain.file.FileGroup;
 import park.shop.repository.file.FileRepository;
 import park.shop.repository.member.MemberRepository;
 
@@ -50,18 +49,21 @@ class ProductRepositoryImplTest {
     @Test
     void findAll() {
         //given
-        ProductResult result = createProductDate();
-        productRepository.save(result.product);
+        ProductResult result1 = createProductDate();
+        productRepository.save(result1.product);
+        ProductResult result2 = createProductDate();
+        productRepository.save(result2.product);
 
         //when
         ProductSearchCond cond = new ProductSearchCond();
-        cond.setMember(result.member);
-        cond.setName(result.product.getName());
-        Pageable pageable = new Pageable(5, 1);
+        cond.setName(result1.product.getName());
+        Pageable pageable = new Pageable(1, 1);
         List<Product> productList = productRepository.findAll(cond, pageable);
+        Long count = productRepository.findAllCount(cond);
 
         //then
         assertThat(productList.size()).isEqualTo(1);
+        assertThat(count).isEqualTo(2);
     }
 
     Member createDumpMember(String addText, GenderType gender) {

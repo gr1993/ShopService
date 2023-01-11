@@ -55,7 +55,7 @@ public class ProductController {
     @GetMapping("/member/list")
     public Object productList(
             @Login Member member,
-            @RequestParam(required = false) ProductSearchCond productSearchCond,
+            @ModelAttribute ProductSearchCond productSearchCond,
             @RequestParam(defaultValue = "3") Integer pageSize,
             @RequestParam(defaultValue = "1") Integer page
     ) {
@@ -63,11 +63,14 @@ public class ProductController {
             productSearchCond = new ProductSearchCond();
         }
         productSearchCond.setMember(member);
+
         List<ProductInfoDto> productList = productService.findAll(productSearchCond, new Pageable(pageSize, page));
+        Long totalCount = productService.findAllCount(productSearchCond);
 
         ResultDto resultDto = new ResultDto();
         resultDto.setSuccess(true);
         resultDto.setData(productList);
+        resultDto.setTotalCount(totalCount);
         return resultDto;
     }
 

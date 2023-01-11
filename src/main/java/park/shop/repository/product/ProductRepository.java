@@ -13,4 +13,6 @@ public interface ProductRepository {
     Optional<Product> findById(Long id);
 
     List<Product> findAll(ProductSearchCond cond, Pageable pageable);
+
+    Long findAllCount(ProductSearchCond cond);
 }

@@ -103,4 +103,8 @@ public class ProductService {
 
         return result;
     }
+
+    public Long findAllCount(ProductSearchCond cond) {
+        return productRepository.findAllCount(cond);
+    }
 }

@@ -1,6 +1,7 @@
 package park.shop.repository.product;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +14,7 @@ import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 
+import static org.springframework.data.jpa.domain.Specification.where;
 import static park.shop.domain.product.QProduct.product;
 
 @Repository
@@ -41,18 +43,43 @@ public class ProductRepositoryImpl implements ProductRepository {
 
     @Override
     public List<Product> findAll(ProductSearchCond cond, Pageable pageable) {
+        JPAQuery<Product> queryUtilFrom = query
+                .select(product)
+                .from(product);
+
+        JPAQuery<Product> queryUtilWhere = setWhereInQuery(queryUtilFrom, cond);
+
+        return queryUtilWhere
+                .limit(pageable.getPageSize())
+                .offset(pageable.getOffset())
+                .orderBy(
+                        product.createDt.desc()
+                )
+                .fetch();
+    }
+
+    @Override
+    public Long findAllCount(ProductSearchCond cond) {
+        JPAQuery<Long> queryUtilFrom = query
+                .select(product.count())
+                .from(product);
+
+        JPAQuery<Long> queryUtilWhere = setWhereInQuery(queryUtilFrom, cond);
+        return queryUtilWhere.fetchFirst();
+    }
+
+    private <T> JPAQuery<T> setWhereInQuery(JPAQuery<T> queryUtilFrom, ProductSearchCond cond) {
         Member member = cond.getMember();
         String name = cond.getName();
         Integer price = cond.getPrice();
         Integer quantity = cond.getQuantity();
 
-        return query
-                .select(product)
-                .from(product)
-                .where(equalMemberId(member), likeName(name))
-                .limit(pageable.getPageSize())
-                .offset(pageable.getOffset())
-                .fetch();
+        return queryUtilFrom.where(
+                equalMemberId(member),
+                likeName(name),
+                maxPrice(price),
+                maxQuantity(quantity)
+        );
     }
 
     private BooleanExpression equalMemberId(Member member) {
@@ -65,6 +92,20 @@ public class ProductRepositoryImpl implements ProductRepository {
     private BooleanExpression likeName(String name) {
         if(StringUtils.hasText(name)) {
             return product.name.like("%" + name + "%");
+        }
+        return null;
+    }
+
+    private BooleanExpression maxPrice(Integer maxPrice) {
+        if(maxPrice != null) {
+            return product.price.loe(maxPrice);
+        }
+        return null;
+    }
+
+    private BooleanExpression maxQuantity(Integer maxQuantity) {
+        if(maxQuantity != null) {
+            return product.quantity.loe(maxQuantity);
         }
         return null;
     }
