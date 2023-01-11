@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
+import park.shop.common.dto.Pageable;
 import park.shop.common.util.EncryptUtil;
 import park.shop.domain.member.GenderType;
 import park.shop.domain.member.Member;
@@ -14,6 +15,8 @@ import park.shop.domain.file.File;
 import park.shop.domain.file.FileGroup;
 import park.shop.repository.file.FileRepository;
 import park.shop.repository.member.MemberRepository;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -34,6 +37,51 @@ class ProductRepositoryImplTest {
     @Test
     void save() {
         //given
+        ProductResult result = createProductDate();
+
+        //when
+        Product savedProduct = productRepository.save(result.product);
+
+        //then
+        assertThat(savedProduct.getId()).isNotNull();
+        assertThat(savedProduct).isEqualTo(result.product);
+    }
+
+    @Test
+    void findAll() {
+        //given
+        ProductResult result = createProductDate();
+        productRepository.save(result.product);
+
+        //when
+        ProductSearchCond cond = new ProductSearchCond();
+        cond.setMember(result.member);
+        cond.setName(result.product.getName());
+        Pageable pageable = new Pageable(5, 1);
+        List<Product> productList = productRepository.findAll(cond, pageable);
+
+        //then
+        assertThat(productList.size()).isEqualTo(1);
+    }
+
+    Member createDumpMember(String addText, GenderType gender) {
+        Member member = new Member();
+        member.setLoginId("test" + addText);
+        String pwd = "pw" + addText;
+        String salt = EncryptUtil.getSalt();
+        String encryptedPwd = EncryptUtil.getEncrypt(pwd, salt);
+        member.setPassword(encryptedPwd);
+        member.setSalt(salt);
+        member.setName("박강림" + addText);
+        member.setRole("일반" + addText);
+        member.setGender(gender.toString());
+        member.setLoginType("web" + addText);
+        member.setAddress("주소" + addText);
+
+        return member;
+    }
+
+    private ProductResult createProductDate() {
         Member member = createDumpMember("1", GenderType.M);
         memberRepository.save(member);
 
@@ -64,39 +112,16 @@ class ProductRepositoryImplTest {
         product.setMainImage(mainImage);
         product.setDescImageGroup(fileGroup);
 
-        //when
-        Product savedProduct = productRepository.save(product);
-
-        //then
-        assertThat(savedProduct.getId()).isNotNull();
-        assertThat(savedProduct).isEqualTo(product);
+        return new ProductResult(member, product);
     }
 
-    @Test
-    void find() {
-//        Product product = productRepository.findById(4L).orElse(null);
-//        log.info("product={}", product.getId());
-//        log.info("member={}", product.getMember().getId());
-//        log.info("mainImage={}", product.getMainImage().getId());
-//        log.info("mainImageName={}", product.getMainImage().getName());
-//        log.info("descImageGroup={}", product.getDescImageGroup().getId());
-//        log.info("descImageGroupFiles={}", product.getDescImageGroup().getFiles().size());
-    }
+    public class ProductResult {
+        Member member;
+        Product product;
 
-    Member createDumpMember(String addText, GenderType gender) {
-        Member member = new Member();
-        member.setLoginId("test" + addText);
-        String pwd = "pw" + addText;
-        String salt = EncryptUtil.getSalt();
-        String encryptedPwd = EncryptUtil.getEncrypt(pwd, salt);
-        member.setPassword(encryptedPwd);
-        member.setSalt(salt);
-        member.setName("박강림" + addText);
-        member.setRole("일반" + addText);
-        member.setGender(gender.toString());
-        member.setLoginType("web" + addText);
-        member.setAddress("주소" + addText);
-
-        return member;
+        public ProductResult(Member member, Product product) {
+            this.member = member;
+            this.product = product;
+        }
     }
 }

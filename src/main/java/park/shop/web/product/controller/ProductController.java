@@ -6,11 +6,22 @@ import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+
+import park.shop.common.dto.Pageable;
 import park.shop.common.dto.ResultDto;
 import park.shop.domain.member.Member;
+import park.shop.repository.file.FileRepository;
+import park.shop.repository.product.ProductSearchCond;
+import park.shop.web.product.dto.ProductInfoDto;
 import park.shop.web.product.dto.ProductRegisterDto;
 import park.shop.web.product.service.ProductService;
 import park.shop.web.util.argumentresolver.Login;
+import park.shop.domain.file.File;
+
+import java.net.MalformedURLException;
+import java.util.List;
 
 @Slf4j
 @Controller
@@ -21,6 +32,9 @@ public class ProductController {
     private ProductService productService;
 
     @Autowired
+    private FileRepository fileRepository;
+
+    @Autowired
     private MessageSource ms;
 
     @GetMapping("/member")
@@ -29,21 +43,40 @@ public class ProductController {
     }
 
     @ResponseBody
+    @GetMapping("/image/{fileId}")
+    public Resource downloadImage(@PathVariable Long fileId) throws MalformedURLException {
+        File file = fileRepository.findById(fileId).orElse(null);
+
+        return new UrlResource("file:" + file.getPath());
+    }
+
+
+    @ResponseBody
+    @GetMapping("/member/list")
+    public Object productList(
+            @Login Member member,
+            @RequestParam(required = false) ProductSearchCond productSearchCond,
+            @RequestParam(defaultValue = "3") Integer pageSize,
+            @RequestParam(defaultValue = "1") Integer page
+    ) {
+        if (productSearchCond == null) {
+            productSearchCond = new ProductSearchCond();
+        }
+        productSearchCond.setMember(member);
+        List<ProductInfoDto> productList = productService.findAll(productSearchCond, new Pageable(pageSize, page));
+
+        ResultDto resultDto = new ResultDto();
+        resultDto.setSuccess(true);
+        resultDto.setData(productList);
+        return resultDto;
+    }
+
+    @ResponseBody
     @PostMapping("/register")
     public Object register(
             @Login Member member,
             @Validated @ModelAttribute ProductRegisterDto productRegisterDto
     ) {
-        log.info("getName={}", productRegisterDto.getName());
-        log.info("getPrice={}", productRegisterDto.getPrice());
-        log.info("getSalePrice={}", productRegisterDto.getSalePrice());
-        log.info("getQuantity={}", productRegisterDto.getQuantity());
-        log.info("getMainImage={}", productRegisterDto.getMainImage());
-        log.info("getDescImageGroup={}", productRegisterDto.getDescImageGroup());
-        if (productRegisterDto.getDescImageGroup() != null) {
-            log.info("getDescImageGroupSize={}", productRegisterDto.getDescImageGroup().size());
-        }
-
         productService.registerProduct(productRegisterDto, member.getId());
 
         ResultDto resultDto = new ResultDto();

@@ -6,6 +6,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import park.shop.common.dto.Pageable;
 import park.shop.common.util.FileUtil;
 import park.shop.domain.file.File;
 import park.shop.domain.file.FileGroup;
@@ -15,7 +16,14 @@ import park.shop.domain.product.Product;
 import park.shop.repository.file.FileRepository;
 import park.shop.repository.member.MemberRepository;
 import park.shop.repository.product.ProductRepository;
+import park.shop.repository.product.ProductSearchCond;
+import park.shop.web.product.dto.ProductInfoDto;
 import park.shop.web.product.dto.ProductRegisterDto;
+import park.shop.web.util.formatter.LocalDateTimeFormatter;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 @Service
 @Transactional
@@ -71,5 +79,28 @@ public class ProductService {
             product.setDescImageGroup(fileGroup);
         }
         productRepository.save(product);
+    }
+
+    public List<ProductInfoDto> findAll(ProductSearchCond cond, Pageable pageable) {
+        LocalDateTimeFormatter localDateTimeFormatter = new LocalDateTimeFormatter();
+
+        List<ProductInfoDto> result = new ArrayList<>();
+        List<Product> products = productRepository.findAll(cond, pageable);
+        for(Product product : products) {
+            ProductInfoDto productInfoDto = new ProductInfoDto();
+            if (product.getMainImage() != null) {
+                productInfoDto.setMainImageId(product.getMainImage().getId());
+            }
+            productInfoDto.setName(product.getName());
+            productInfoDto.setPrice(product.getPrice());
+            productInfoDto.setSalePrice(product.getSalePrice());
+            productInfoDto.setQuantity(product.getQuantity());
+            productInfoDto.setCreateDt(localDateTimeFormatter.print(product.getCreateDt(), Locale.KOREA));
+            productInfoDto.setUpdateDt(localDateTimeFormatter.print(product.getUpdateDt(), Locale.KOREA));
+
+            result.add(productInfoDto);
+        }
+
+        return result;
     }
 }

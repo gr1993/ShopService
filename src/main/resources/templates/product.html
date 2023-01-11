@@ -71,6 +71,11 @@
       .product-modal-field-item-value {
           width: 70%;
       }
+
+      .product-image {
+        width: 120px;
+        height: 120px;
+      }
   </style>
   <div class="product-container">
     <div class="product-row" style="margin-bottom: 20px;">
@@ -103,7 +108,7 @@
         </div>
       </div>
       <div class="product-searchbox-btn-row">
-        <button type="button" class="btn btn-secondary product-btn-item">검색</button>
+        <button type="button" class="btn btn-secondary product-btn-item" onclick="searchProduct()">검색</button>
       </div>
     </div>
     <div class="product-row">
@@ -113,71 +118,22 @@
         <button type="button" class="btn btn-danger product-btn-item">삭제</button>
       </div>
     </div>
-    <div class="product-row" style="height:400px;">
+    <div class="product-row" style="height:480px;">
       <table class="table table-bordered">
         <thead class="table-dark">
-        <tr>
-          <th class="text-center" scope="col">선택</th>
-          <th scope="col">대표 이미지</th>
-          <th scope="col">상품명</th>
-          <th scope="col">가격</th>
-          <th scope="col">세일 가격</th>
-          <th scope="col">수량</th>
-          <th scope="col">등록일</th>
-          <th scope="col">수정일</th>
-        </tr>
+          <tr>
+            <th class="text-center" scope="col">선택</th>
+            <th class="text-center" scope="col">대표 이미지</th>
+            <th scope="col">상품명</th>
+            <th scope="col">가격</th>
+            <th scope="col">세일 가격</th>
+            <th scope="col">수량</th>
+            <th scope="col">등록일</th>
+            <th scope="col">수정일</th>
+          </tr>
         </thead>
-        <tbody>
-        <tr>
-          <td class="text-center"><input type="checkbox"></td>
-          <td><img src=""></td>
-          <td>땍뚜 머신</td>
-          <td>1,000</td>
-          <td>500</td>
-          <td>80</td>
-          <td>2000-12-12 01:10:10</td>
-          <td>2000-12-12 01:10:10</td>
-        </tr>
-        <tr>
-          <td class="text-center"><input type="checkbox"></td>
-          <td><img src=""></td>
-          <td>땍뚜 머신</td>
-          <td>1,000</td>
-          <td>500</td>
-          <td>80</td>
-          <td>2000-12-12 01:10:10</td>
-          <td>2000-12-12 01:10:10</td>
-        </tr>
-        <tr>
-          <td class="text-center"><input type="checkbox"></td>
-          <td><img src=""></td>
-          <td>땍뚜 머신</td>
-          <td>1,000</td>
-          <td>500</td>
-          <td>80</td>
-          <td>2000-12-12 01:10:10</td>
-          <td>2000-12-12 01:10:10</td>
-        </tr>
-        <tr>
-          <td class="text-center"><input type="checkbox"></td>
-          <td><img src=""></td>
-          <td>땍뚜 머신</td>
-          <td>1,000</td>
-          <td>500</td>
-          <td>80</td>
-          <td>2000-12-12 01:10:10</td>
-          <td>2000-12-12 01:10:10</td>
-        </tr>
-        <tr>
-          <td class="text-center"><input type="checkbox"></td>
-          <td><img src=""></td>
-          <td>땍뚜 머신</td>
-          <td>1,000</td>
-          <td>500</td>
-          <td>80</td>
-          <td>2000-12-12 01:10:10</td>
-          <td>2000-12-12 01:10:10</td>
-        </tr>
+        <tbody id="productTableBody">
+
         </tbody>
       </table>
     </div>
@@ -252,15 +208,83 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-            <button type="button" class="btn btn-primary" id="productRegister" onclick="productRegister()">등록</button>
+            <button type="button" class="btn btn-primary" id="productRegister" onclick="registerProduct()">등록</button>
           </div>
         </div>
       </div>
     </div>
   </div>
   <script th:inline="javascript">
+    //검색 함수
+    function searchProduct() {
+      let param = '';
+      let isFirst = true;
+
+      const name = $("#searchName")[0].value;
+      if(name) {
+        if(isFirst) {
+          param += "?";
+          isFirst = false;
+        } else {
+          param += "&";
+        }
+        param += `name=${name}`;
+      }
+
+      const price = $("#searchPrice")[0].value;
+      if(price) {
+        if(isFirst) {
+          param += "?";
+          isFirst = false;
+        } else {
+          param += "&";
+        }
+        param += `price=${price}`;
+      }
+
+      const salePrice = $("#searchQuantity")[0].value;
+      if(salePrice) {
+        if(isFirst) {
+          param += "?";
+          isFirst = false;
+        } else {
+          param += "&";
+        }
+        param += `salePrice=${salePrice}`;
+      }
+
+      $.ajax({
+        type: 'GET',
+        url: '/product/member/list' + param,
+        success: function(res) {
+          if (res.success) {
+            let template = '';
+            for(var index=0; index < res.data.length; index++) {
+               const product = res.data[index];
+
+               template += `
+                <tr>
+                  <td class="text-center"><input type="checkbox"></td>
+                  <td class="text-center"><img src="/product/image/${product.mainImageId}" class="product-image"></td>
+                  <td>${product.name}</td>
+                  <td>${product.price}</td>
+                  <td>${product.salePrice}</td>
+                  <td>${product.quantity}</td>
+                  <td>${product.createDt}</td>
+                  <td>${product.updateDt}</td>
+                </tr>
+                `
+            }
+
+            const table = $("#productTableBody")[0];
+            table.innerHTML = template;
+          }
+        }
+      })
+    }
+
     //상품 등록 함수
-    function productRegister () {
+    function registerProduct () {
       if(!confirm([[#{product.register}]])) {
         return;
       }

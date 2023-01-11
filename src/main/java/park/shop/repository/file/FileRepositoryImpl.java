@@ -7,6 +7,7 @@ import park.shop.domain.file.File;
 import park.shop.domain.file.FileGroup;
 
 import javax.persistence.EntityManager;
+import java.util.Optional;
 
 @Repository
 @Transactional
@@ -30,5 +31,11 @@ public class FileRepositoryImpl implements FileRepository{
     public FileGroup save(FileGroup fileGroup) {
         em.persist(fileGroup);
         return fileGroup;
+    }
+
+    @Override
+    public Optional<File> findById(Long id) {
+        File file = em.find(File.class, id);
+        return Optional.ofNullable(file);
     }
 }
