@@ -1,10 +1,13 @@
 package park.shop.domain.member;
 
-import com.sun.istack.NotNull;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
+import park.shop.domain.product.Product;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Entity
@@ -44,6 +47,9 @@ public class Member {
 
     @Column
     private LocalDateTime updateDt;
+
+    @OneToMany
+    private List<Product> products = new ArrayList<>();
 
     public Member() {
     }
