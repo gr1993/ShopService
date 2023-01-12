@@ -17,6 +17,8 @@
         }
         .product-info-container {
             display: flex;
+            border: 1px solid gray;
+            border-radius: 5px;
         }
         .product-info-item {
             width: 50%;
@@ -48,7 +50,7 @@
             </div>
             <div class="product-info-item" th:object="${product}">
                 <h4>판매 정보</h4>
-                <input type="hidden" th:field="*{id}">
+                <input type="hidden" th:field="*{id}" id="productId">
                 <div class="mb-3 row">
                     <label for="name" class="col-sm-3 col-form-label product-info-label">상품명</label>
                     <div class="col-sm-9">
@@ -70,7 +72,7 @@
                 <div class="mb-3 row">
                     <label for="quantity" class="col-sm-3 col-form-label product-info-label">수량</label>
                     <div class="col-sm-9">
-                        <input th:field="*{quantity}" type="text" readonly class="form-control-plaintext" id="quantity" value="20개">
+                        <input th:field="*{quantity}" type="number" readonly class="form-control-plaintext" id="quantity" value="20">
                     </div>
                 </div>
                 <div class="mb-3 row">
@@ -79,9 +81,18 @@
                         <input th:field="*{createDt}" type="text" readonly class="form-control-plaintext" id="createDt" value="2021년 12월 21일">
                     </div>
                 </div>
-                <div style="height:110px"></div>
+                <div class="row" style="height:110px;">
+                    <label for="orderQuantity" class="col-sm-3 col-form-label product-info-label">구매 수량</label>
+                    <div class="col-sm-9">
+                        <input type="number" class="form-control" id="orderQuantity" min="1" oninput="orderQuantityChange()">
+                    </div>
+                    <label class="col-sm-3 col-form-label product-info-label">최종 금액</label>
+                    <div class="col-sm-9">
+                        <h4 id="finalTotalPrice">0</h4>
+                    </div>
+                </div>
                 <div>
-                    <button type="button" class="btn btn-dark product-order-btn">주문하기</button>
+                    <button type="button" class="btn btn-dark product-order-btn" onclick="orderProduct()">주문하기</button>
                 </div>
             </div>
         </div>
@@ -92,7 +103,116 @@
     </div>
     <script th:inline="javascript">
 
+        //최종 금액 계산 이벤트
+        function orderQuantityChange() {
+            //주문 수량
+            const orderQuantityInput = $('#orderQuantity')[0];
+            let orderQuantity = Number(orderQuantityInput.value);
+            //상품 수량
+            let quantity = Number($('#quantity')[0].value);
+            let price = $('#price')[0].value;
+            let salePrice = $('#salePrice')[0].value;
+
+            let finalPrice = 0;
+            if (!salePrice) {
+                price = price.replaceAll(',', '');
+                price = price.replaceAll('원', '');
+
+                finalPrice = Number(price);
+            } else {
+                salePrice = salePrice.replaceAll(',', '');
+                salePrice = salePrice.replaceAll('원', '');
+
+                finalPrice = Number(salePrice);
+            }
+
+            //주문수량이 상품수량보다 많으면 상품수량으로 설정
+            if (orderQuantity > quantity) {
+                orderQuantity = quantity;
+                orderQuantityInput.value = quantity;
+            }
+
+            //최종 금액 계산 후 보여주기
+            const finalTotalPriceInput = $('#finalTotalPrice')[0];
+            finalTotalPriceInput.innerText = (finalPrice * orderQuantity) + '원';
+        }
+
+        //주문버튼 클릭 이벤트
+        function orderProduct() {
+            //주문 수량 입력 여부 확인
+            const orderQuantityInput = $('#orderQuantity')[0];
+            if(!orderQuantityInput.value) {
+                alert('구매 수량을 입력하세요.');
+                return;
+            }
+            if(Number(orderQuantityInput.value) <= 0) {
+                alert('잘못된 수량 입력');
+                return;
+            }
+
+            if(confirm([[#{product.order}]])) {
+                const idHidden = $('#productId')[0];
+                const orderQuantityInput = $('#orderQuantity')[0]
+
+                if (!orderQuantityInput.value || Number(orderQuantityInput.value) <= 0) {
+                    alert([[#{product.order.quantity.input}]]);
+                    return;
+                }
+
+                const productId = idHidden.value;
+                const orderQuantity = orderQuantityInput.value;
+
+                $.ajax({
+                    type:"POST",
+                    url: `/order/info?productId=${productId}&orderQuantity=${orderQuantity}`,
+                    success: function(res) {
+                      //로그인이 안되어 있는 경우 HTML로 반환됨
+                      if (res.startsWith && res.startsWith('<!DOCTYPE html>')) {
+                        location.href = '/member/login?redirectURL=/product/desc/form/' + idHidden.value;
+                        return;
+                      }
+
+                      if (res.success) {
+                        paymentForm(productId, orderQuantity, res.data);
+                      }
+                    },
+                    err: function(err) {
+                      alert([[#{product.order.fail}]]);
+                    }
+                })
+            }
+        }
+
+        //결제 창 띄우기 함수
+        function paymentForm(productId, orderQuantity, orderInfoDto) {
+            IMP.init("imp13716273");
+            IMP.request_pay({
+                pg: "kakaopay.TC0ONETIME",            //pg사명 or pg사명.CID (잘못 입력 시 기본 PG사가 나옴)
+                pay_method: "card",                   //지불 방법
+                merchant_uid: orderInfoDto.merchantUid,  //가맹점 주문번호 (아임포트에서 사용하는 가맹점에서 중복되지 않는 임의의 문자열 입력) : "ORD20180131-0000011"
+                name: orderInfoDto.productName,
+                amount: orderInfoDto.amount,
+                //buyer_email: "gildong@gmail.com",   //구매자 이메일, 이 프로젝트에서 이메일 없음
+                buyer_name: orderInfoDto.memberName,
+                //buyer_tel: "010-4242-4242",         //구매자 번호, 이 프로젝트에서 번호 없음
+                buyer_addr: orderInfoDto.memberAddress,
+                //buyer_postcode: "01181"             //구매자 우편번호, 이 프로젝트에서 우편번호 없음
+            }, function (rsp) {
+                if (rsp.success) {
+                    alert([[#{order.payment.complete}]]);
+                } else {
+                    alert([[#{order.payment.fail}]]);
+                }
+            });
+        }
+
+        //결제된 정보 저장 함수
+        function registerOrder() {
+
+        }
     </script>
+    <!-- iamport.payment.js -->
+    <script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
 </section>
 </body>
 </html>

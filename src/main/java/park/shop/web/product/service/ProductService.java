@@ -163,7 +163,7 @@ public class ProductService {
             result.setPrice(numberFormatter.print(productDescDto.getPrice(), Locale.KOREA) + "원");
         }
         if (productDescDto.getSalePrice() != null) {
-            result.setSalePrice(numberFormatter.print(productDescDto.getSalePrice(), Locale.KOREA) + "원'");
+            result.setSalePrice(numberFormatter.print(productDescDto.getSalePrice(), Locale.KOREA) + "원");
         }
         result.setQuantity(productDescDto.getQuantity());
         result.setCreateDt(productDescDto.getCreateDt());
