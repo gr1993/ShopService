@@ -54,6 +54,18 @@ public class ProductController {
         return new UrlResource("file:" + file.getPath());
     }
 
+    @ResponseBody
+    @GetMapping("/all/list")
+    public Object productAllList() {
+        ProductSearchCond productSearchCond = new ProductSearchCond();
+        List<ProductInfoDto> productList = productService.findAll(productSearchCond, new Pageable(10000, 1));
+        Long totalCount = productService.findAllCount(productSearchCond);
+
+        ResultDto resultDto = new ResultDto(true);
+        resultDto.setData(productList);
+        resultDto.setTotalCount(totalCount);
+        return resultDto;
+    }
 
     @ResponseBody
     @GetMapping("/member/list")
