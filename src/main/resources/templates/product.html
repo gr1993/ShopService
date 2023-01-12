@@ -14,6 +14,7 @@
       .product-container {
           padding: 20px;
           width: 1000px;
+          margin: 0px auto;
       }
       .product-row {
           margin: 10px 0px;
@@ -114,8 +115,8 @@
     <div class="product-row">
       <div class="product-btn-container">
         <button type="button" class="btn btn-primary product-btn-item" data-bs-toggle="modal" data-bs-target="#insertModal">등록</button>
-        <button type="button" class="btn btn-success product-btn-item">수정</button>
-        <button type="button" class="btn btn-danger product-btn-item">삭제</button>
+        <button type="button" class="btn btn-success product-btn-item" onclick="updateBtnClick()">수정</button>
+        <button type="button" class="btn btn-danger product-btn-item" onclick="deleteProduct()">삭제</button>
       </div>
     </div>
     <div class="product-row" style="height:480px;">
@@ -149,7 +150,7 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="exampleModalLabel">상품 등록</h1>
+            <h1 class="modal-title fs-5">상품 등록</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
@@ -208,6 +209,90 @@
         </div>
       </div>
     </div>
+
+    <!-- 수정 모달 -->
+    <div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5">상품 수정</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <!-- 상품 ID 히든 필드 -->
+            <input type="hidden" id="updateId">
+
+            <!-- 상품명 입력 -->
+            <div class="product-modal-row">
+              <label for="registerName" class="product-modal-field-item-name col-form-label text-center">상품명</label>
+              <div class="product-modal-field-item-value">
+                <input type="text" class="form-control" id="updateName">
+              </div>
+            </div>
+
+            <!-- 가격 입력 -->
+            <div class="product-modal-row">
+              <label for="registerPrice" class="product-modal-field-item-name col-form-label text-center">가격</label>
+              <div class="product-modal-field-item-value">
+                <input type="number" class="form-control" id="updatePrice">
+              </div>
+            </div>
+
+            <!-- 세일 가격 입력 -->
+            <div class="product-modal-row">
+              <label for="registerSalePrice" class="product-modal-field-item-name col-form-label text-center">세일 가격</label>
+              <div class="product-modal-field-item-value">
+                <input type="number" class="form-control" id="updateSalePrice">
+              </div>
+            </div>
+
+            <!-- 수량 입력 -->
+            <div class="product-modal-row">
+              <label for="registerQuantity" class="product-modal-field-item-name col-form-label text-center">수량</label>
+              <div class="product-modal-field-item-value">
+                <input type="number" class="form-control" id="updateQuantity">
+              </div>
+            </div>
+
+            <!-- 대표이미지 입력 -->
+            <div class="product-modal-row">
+              <label for="registerMainImage" class="product-modal-field-item-name col-form-label text-center">대표 이미지</label>
+              <div class="product-modal-field-item-value">
+                <input type="file" class="form-control-file" id="updateMainImage">
+              </div>
+            </div>
+
+            <!-- 기존 등록된 대표이미지명 -->
+            <div class="product-modal-row">
+              <label class="product-modal-field-item-name col-form-label text-center"></label>
+              <div class="product-modal-field-item-value">
+                <input type="text" class="form-control" id="updateMainImageName" readonly>
+              </div>
+            </div>
+
+            <!-- 상세이미지 입력 -->
+            <div class="product-modal-row">
+              <label for="registerDescImageGroup" class="product-modal-field-item-name col-form-label text-center">상세 이미지</label>
+              <div class="product-modal-field-item-value">
+                <input type="file" class="form-control-file" id="updateDescImageGroup" multiple>
+              </div>
+            </div>
+
+            <!-- 기존 등록된 상세이미지명 -->
+            <div class="product-modal-row">
+              <label class="product-modal-field-item-name col-form-label text-center"></label>
+              <div class="product-modal-field-item-value">
+                <input type="text" class="form-control" id="updateDescImageNames" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            <button type="button" class="btn btn-primary" id="productUpdate" onclick="updateProduct()">수정</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
   <script th:inline="javascript">
     //한 페이지에 3개 씩 출력
@@ -250,7 +335,7 @@
 
                template += `
                 <tr>
-                  <td class="text-center"><input type="checkbox"></td>
+                  <td class="text-center"><input type="checkbox" name="productCheck" productId="${product.id}"></td>
                   <td class="text-center"><img src="/product/image/${product.mainImageId}" class="product-image"></td>
                   <td>${product.name}</td>
                   <td>${product.price}</td>
@@ -342,6 +427,7 @@
           if (res.success) {
             alert([[#{product.register.complete}]]);
             $('#insertModal').modal('hide');
+            searchProduct(1);
           } else {
             alert(res.message);
           }
@@ -350,6 +436,130 @@
           alert([[#{product.register.fail}]]);
         }
       })
+    }
+
+    //상품 수정버튼 이벤트(수정 작업X)
+    function updateBtnClick() {
+      var checkbox = $("input[name=productCheck]:checked");
+
+      if (checkbox.length === 1) {
+        var productId = checkbox[0].getAttribute('productId');
+
+        $.ajax({
+          type: 'GET',
+          url: `/product/desc/${productId}`,
+          success: function(res) {
+            const product = res.data;
+
+            const idHidden = $("#updateId")[0];
+            idHidden.value = product.id;
+
+            const nameInput = $("#updateName")[0];
+            nameInput.value = product.name;
+
+            const priceInput = $("#updatePrice")[0];
+            priceInput.value = product.price;
+
+            const salePriceInput = $("#updateSalePrice")[0];
+            salePriceInput.value = product.salePrice;
+
+            const quantityInput = $("#updateQuantity")[0];
+            quantityInput.value = product.quantity;
+
+            const mainImageNameInput = $("#updateMainImageName")[0];
+            mainImageNameInput.value = product.mainImageName;
+
+            const descImageNamesInput = $("#updateDescImageNames")[0];
+            descImageNamesInput.value = product.descImageNames;
+
+            $('#updateModal').modal('show');
+          }
+        });
+      } else {
+        alert([[#{product.select.one}]])
+      }
+    }
+
+    //상품 수정 함수
+    function updateProduct () {
+      if(!confirm([[#{product.update}]])) {
+        return;
+      }
+
+      const idHidden = $("#updateId")[0];
+      const nameInput = $("#updateName")[0];
+      const priceInput = $("#updatePrice")[0];
+      const salePriceInput = $("#updateSalePrice")[0];
+      const quantityInput = $("#updateQuantity")[0];
+      const mainImageInput = $("#updateMainImage")[0];
+      const descImageGroupInput = $("#updateDescImageGroup")[0];
+
+      const formData = new FormData();
+      formData.append('name', nameInput.value);
+      formData.append('price', priceInput.value);
+      formData.append('salePrice', salePriceInput.value);
+      formData.append('quantity', quantityInput.value);
+      if (mainImageInput.files.length > 0) {
+        formData.append('mainImage', mainImageInput.files[0]);
+      }
+      if (descImageGroupInput.files.length > 0) {
+        for(var index = 0; index < descImageGroupInput.files.length; index++) {
+          formData.append('descImageGroup', descImageGroupInput.files[index]);
+        }
+      }
+
+      $.ajax({
+        type:"POST",
+        url: "/product/update/" + idHidden.value,
+        processData: false,
+        contentType: false,
+        data: formData,
+        success: function(res) {
+          if (res.success) {
+            alert([[#{product.update.complete}]]);
+            $('#updateModal').modal('hide');
+            searchProduct(1);
+          } else {
+            alert(res.message);
+          }
+        },
+        err: function(err) {
+          alert([[#{product.update.fail}]]);
+        }
+      })
+    }
+
+    //상품 삭제 함수
+    function deleteProduct () {
+      var checkbox = $("input[name=productCheck]:checked");
+
+      if (checkbox.length === 1) {
+        if(!confirm([[#{product.delete}]])) {
+          return;
+        }
+
+        var productId = checkbox[0].getAttribute('productId');
+
+        $.ajax({
+          type:"POST",
+          url: "/product/delete/" + productId,
+          processData: false,
+          contentType: false,
+          success: function(res) {
+            if (res.success) {
+              alert([[#{product.delete.complete}]]);
+              searchProduct(1);
+            } else {
+              alert(res.message);
+            }
+          },
+          err: function(err) {
+            alert([[#{product.delete.fail}]]);
+          }
+        })
+      } else {
+        alert([[#{product.select.one}]])
+      }
     }
   </script>
 </section>

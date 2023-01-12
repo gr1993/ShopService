@@ -1,7 +1,6 @@
 package park.shop.web.product.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,20 +9,23 @@ import park.shop.common.dto.Pageable;
 import park.shop.common.util.FileUtil;
 import park.shop.domain.file.File;
 import park.shop.domain.file.FileGroup;
-import park.shop.domain.member.GenderType;
 import park.shop.domain.member.Member;
 import park.shop.domain.product.Product;
 import park.shop.repository.file.FileRepository;
 import park.shop.repository.member.MemberRepository;
 import park.shop.repository.product.ProductRepository;
 import park.shop.repository.product.ProductSearchCond;
+import park.shop.repository.product.ProductUpdateDto;
+import park.shop.web.product.dto.ProductDescDto;
 import park.shop.web.product.dto.ProductInfoDto;
 import park.shop.web.product.dto.ProductRegisterDto;
+import park.shop.web.product.dto.ProductUpdateFormDto;
 import park.shop.web.util.formatter.LocalDateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -88,6 +90,7 @@ public class ProductService {
         List<Product> products = productRepository.findAll(cond, pageable);
         for(Product product : products) {
             ProductInfoDto productInfoDto = new ProductInfoDto();
+            productInfoDto.setId(product.getId());
             if (product.getMainImage() != null) {
                 productInfoDto.setMainImageId(product.getMainImage().getId());
             }
@@ -106,5 +109,88 @@ public class ProductService {
 
     public Long findAllCount(ProductSearchCond cond) {
         return productRepository.findAllCount(cond);
+    }
+
+    public ProductDescDto findById(Long id) {
+        Product product = productRepository.findById(id).orElse(null);
+        if(product == null) {
+            return null;
+        }
+
+        ProductDescDto result = new ProductDescDto();
+        result.setId(product.getId());
+        result.setName(product.getName());
+        result.setPrice(product.getPrice());
+        result.setSalePrice(product.getSalePrice());
+        result.setQuantity(product.getQuantity());
+
+        if(product.getMainImage() != null) {
+            File mainImage = product.getMainImage();
+            result.setMainImageId(mainImage.getId());
+            result.setMainImageName(mainImage.getName());
+        }
+
+        if(product.getDescImageGroup() != null) {
+            List<File> descImages = product.getDescImageGroup().getFiles();
+            List<Long> descImageIds = descImages
+                    .stream()
+                    .map(desc -> desc.getId())
+                    .collect(Collectors.toList());
+
+            result.setDescImageIds(descImageIds.toArray(new Long[descImageIds.size()]));
+
+            List<String> descImageNames = descImages
+                    .stream()
+                    .map(desc -> desc.getName())
+                    .collect(Collectors.toList());
+
+            result.setDescImageNames(String.join(", ", descImageNames));
+        }
+
+        return result;
+    }
+
+    public void updateProduct(Long id, ProductUpdateFormDto updateFormDto) {
+        File mainImage = null;
+        if (updateFormDto.getMainImage() != null) {
+            MultipartFile file = updateFormDto.getMainImage();
+            String uploadedPath = fileUtil.uploadFile(file);
+            mainImage = new File();
+            mainImage.setName(file.getOriginalFilename());
+            mainImage.setPath(uploadedPath);
+            fileRepository.save(mainImage);
+        }
+
+        FileGroup fileGroup = null;
+        if (updateFormDto.getDescImageGroup() != null) {
+            fileGroup = new FileGroup();
+            fileRepository.save(fileGroup);
+
+            for(MultipartFile file : updateFormDto.getDescImageGroup()) {
+                String uploadedPath = fileUtil.uploadFile(file);
+                File descImage1 = new File();
+                descImage1.setName(file.getOriginalFilename());
+                descImage1.setPath(uploadedPath);
+                descImage1.setFileGroup(fileGroup);
+                fileRepository.save(descImage1);
+            }
+        }
+
+        ProductUpdateDto updateDto = new ProductUpdateDto();
+        updateDto.setName(updateFormDto.getName());
+        updateDto.setPrice(updateFormDto.getPrice());
+        updateDto.setSalePrice(updateFormDto.getSalePrice());
+        updateDto.setQuantity(updateFormDto.getQuantity());
+        if (mainImage != null) {
+            updateDto.setMainImage(mainImage);
+        }
+        if (fileGroup != null) {
+            updateDto.setDescImageGroup(fileGroup);
+        }
+        productRepository.update(id, updateDto);
+    }
+
+    public void deleteProduct(Long id) {
+        productRepository.deleteById(id);
     }
 }

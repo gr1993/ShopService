@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 import park.shop.common.dto.Pageable;
 import park.shop.common.util.EncryptUtil;
@@ -64,6 +65,16 @@ class ProductRepositoryImplTest {
         //then
         assertThat(productList.size()).isEqualTo(1);
         assertThat(count).isEqualTo(2);
+    }
+
+    @Test
+    void remove() {
+        //given
+        ProductResult result1 = createProductDate();
+        productRepository.save(result1.product);
+
+        //when
+        productRepository.deleteById(result1.product.getId());
     }
 
     Member createDumpMember(String addText, GenderType gender) {

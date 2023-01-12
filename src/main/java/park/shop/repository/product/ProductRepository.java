@@ -15,4 +15,8 @@ public interface ProductRepository {
     List<Product> findAll(ProductSearchCond cond, Pageable pageable);
 
     Long findAllCount(ProductSearchCond cond);
+
+    void update(Long productId, ProductUpdateDto updateDto);
+
+    void deleteById(Long productId);
 }

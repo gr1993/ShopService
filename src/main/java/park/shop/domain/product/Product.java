@@ -17,7 +17,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name="member_id")
     private Member member;
 
@@ -33,11 +33,11 @@ public class Product {
     @Column
     private Integer quantity;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="main_image_id")
     private File mainImage;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="desc_image_group_id")
     private FileGroup descImageGroup;
 

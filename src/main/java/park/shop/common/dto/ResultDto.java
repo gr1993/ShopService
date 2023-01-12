@@ -10,4 +10,8 @@ public class ResultDto {
     private String message;
     private Object data;
     private Long totalCount;
+
+    public ResultDto(boolean success) {
+        this.success = success;
+    }
 }

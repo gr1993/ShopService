@@ -15,6 +15,9 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 public class ProductInfoDto {
+
+    private Long id;
+
     private Long mainImageId;
 
     private String name;

@@ -6,15 +6,16 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import park.shop.common.dto.Pageable;
+import park.shop.domain.file.File;
+import park.shop.domain.file.FileGroup;
 import park.shop.domain.member.Member;
 import park.shop.domain.product.Product;
-import park.shop.common.dto.Pageable;
 
 import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 
-import static org.springframework.data.jpa.domain.Specification.where;
 import static park.shop.domain.product.QProduct.product;
 
 @Repository
@@ -66,6 +67,41 @@ public class ProductRepositoryImpl implements ProductRepository {
 
         JPAQuery<Long> queryUtilWhere = setWhereInQuery(queryUtilFrom, cond);
         return queryUtilWhere.fetchFirst();
+    }
+
+    @Override
+    public void update(Long productId, ProductUpdateDto updateDto) {
+        Product findProduct = em.find(Product.class, productId);
+        findProduct.setName(updateDto.getName());
+        findProduct.setPrice(updateDto.getPrice());
+        findProduct.setSalePrice(updateDto.getSalePrice());
+        findProduct.setQuantity(updateDto.getQuantity());
+        if (updateDto.getMainImage() != null) {
+            findProduct.setMainImage(updateDto.getMainImage());
+        }
+        if (updateDto.getDescImageGroup() != null) {
+            findProduct.setDescImageGroup(updateDto.getDescImageGroup());
+        }
+    }
+
+    @Override
+    public void deleteById(Long productId) {
+        Product findProduct = findById(productId).orElse(null);
+
+        if(findProduct != null) {
+            File mainImage = findProduct.getMainImage();
+            FileGroup fileGroup = findProduct.getDescImageGroup();
+
+            //자식 엔티티 우선 삭제
+            em.remove(findProduct);
+            for (File descImage : fileGroup.getFiles()) {
+                em.remove(descImage);
+            }
+
+            //부모 엔티티들 제거
+            em.remove(mainImage);
+            em.remove(fileGroup);
+        }
     }
 
     private <T> JPAQuery<T> setWhereInQuery(JPAQuery<T> queryUtilFrom, ProductSearchCond cond) {
