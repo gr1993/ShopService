@@ -44,38 +44,39 @@
     <div class="desc-container">
         <div class="product-info-container">
             <div class="product-info-item">
-                <img class="product-info-main-img">
+                <img th:src="|/product/image/${product.mainImageId}|" class="product-info-main-img">
             </div>
-            <div class="product-info-item">
+            <div class="product-info-item" th:object="${product}">
                 <h4>판매 정보</h4>
+                <input type="hidden" th:field="*{id}">
                 <div class="mb-3 row">
-                    <label for="staticEmail" class="col-sm-3 col-form-label product-info-label">상품명</label>
+                    <label for="name" class="col-sm-3 col-form-label product-info-label">상품명</label>
                     <div class="col-sm-9">
-                        <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="신상 청바지">
+                        <input th:field="*{name}" type="text" readonly class="form-control-plaintext" id="name" value="신상 청바지">
                     </div>
                 </div>
                 <div class="mb-3 row">
-                    <label for="staticEmail" class="col-sm-3 col-form-label product-info-label">가격</label>
+                    <label for="price" class="col-sm-3 col-form-label product-info-label">가격</label>
                     <div class="col-sm-9">
-                        <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="10,000">
+                        <input th:field="*{price}" type="text" readonly class="form-control-plaintext" id="price" value="10,000">
                     </div>
                 </div>
                 <div class="mb-3 row">
-                    <label for="staticEmail" class="col-sm-3 col-form-label product-info-label">할인가</label>
+                    <label for="salePrice" class="col-sm-3 col-form-label product-info-label">할인가</label>
                     <div class="col-sm-9">
-                        <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="9,000">
+                        <input th:field="*{salePrice}" type="text" readonly class="form-control-plaintext" id="salePrice" value="9,000">
                     </div>
                 </div>
                 <div class="mb-3 row">
-                    <label for="staticEmail" class="col-sm-3 col-form-label product-info-label">수량</label>
+                    <label for="quantity" class="col-sm-3 col-form-label product-info-label">수량</label>
                     <div class="col-sm-9">
-                        <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="20개">
+                        <input th:field="*{quantity}" type="text" readonly class="form-control-plaintext" id="quantity" value="20개">
                     </div>
                 </div>
                 <div class="mb-3 row">
-                    <label for="staticEmail" class="col-sm-3 col-form-label product-info-label">등록일</label>
+                    <label for="createDt" class="col-sm-3 col-form-label product-info-label">등록일</label>
                     <div class="col-sm-9">
-                        <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="2021년 12월 21일">
+                        <input th:field="*{createDt}" type="text" readonly class="form-control-plaintext" id="createDt" value="2021년 12월 21일">
                     </div>
                 </div>
                 <div style="height:110px"></div>
@@ -85,8 +86,8 @@
             </div>
         </div>
         <div class="product-desc-container">
-            <h2>상품에 대한 설명</h2>
-            <img class="product-desc-img">
+            <h2 class="mb-5">상품에 대한 설명</h2>
+            <img th:each="descImageId : ${product.descImageIds}" th:src="|/product/image/${descImageId}|" class="product-desc-img">
         </div>
     </div>
     <script th:inline="javascript">

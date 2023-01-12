@@ -16,11 +16,10 @@ import park.shop.repository.member.MemberRepository;
 import park.shop.repository.product.ProductRepository;
 import park.shop.repository.product.ProductSearchCond;
 import park.shop.repository.product.ProductUpdateDto;
-import park.shop.web.product.dto.ProductDescDto;
-import park.shop.web.product.dto.ProductInfoDto;
-import park.shop.web.product.dto.ProductRegisterDto;
-import park.shop.web.product.dto.ProductUpdateFormDto;
+import park.shop.web.product.dto.*;
+import park.shop.web.util.formatter.LocalDateFormatter;
 import park.shop.web.util.formatter.LocalDateTimeFormatter;
+import park.shop.web.util.formatter.NumberFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -112,6 +111,8 @@ public class ProductService {
     }
 
     public ProductDescDto findById(Long id) {
+        LocalDateFormatter localDateFormatter = new LocalDateFormatter();
+
         Product product = productRepository.findById(id).orElse(null);
         if(product == null) {
             return null;
@@ -123,6 +124,7 @@ public class ProductService {
         result.setPrice(product.getPrice());
         result.setSalePrice(product.getSalePrice());
         result.setQuantity(product.getQuantity());
+        result.setCreateDt(localDateFormatter.print(product.getCreateDt(), Locale.KOREA));
 
         if(product.getMainImage() != null) {
             File mainImage = product.getMainImage();
@@ -147,6 +149,26 @@ public class ProductService {
             result.setDescImageNames(String.join(", ", descImageNames));
         }
 
+        return result;
+    }
+
+    public ProductDescFormDto findByIdAboutForm(Long id) {
+        NumberFormatter numberFormatter = new NumberFormatter();
+        ProductDescDto productDescDto = findById(id);
+
+        ProductDescFormDto result = new ProductDescFormDto();
+        result.setId(productDescDto.getId());
+        result.setName(productDescDto.getName());
+        if (productDescDto.getPrice() != null) {
+            result.setPrice(numberFormatter.print(productDescDto.getPrice(), Locale.KOREA) + "원");
+        }
+        if (productDescDto.getSalePrice() != null) {
+            result.setSalePrice(numberFormatter.print(productDescDto.getSalePrice(), Locale.KOREA) + "원'");
+        }
+        result.setQuantity(productDescDto.getQuantity());
+        result.setCreateDt(productDescDto.getCreateDt());
+        result.setMainImageId(productDescDto.getMainImageId());
+        result.setDescImageIds(productDescDto.getDescImageIds());
         return result;
     }
 

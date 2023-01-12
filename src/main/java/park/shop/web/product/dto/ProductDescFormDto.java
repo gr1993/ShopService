@@ -5,22 +5,20 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ProductDescDto {
+public class ProductDescFormDto {
     private Long id;
 
     private String name;
 
-    private Integer price;
+    private String price;
 
-    private Integer salePrice;
+    private String salePrice;
 
     private Integer quantity;
 
     private String createDt;
 
     private Long mainImageId;
-    private String mainImageName;
 
     private Long[] descImageIds;
-    private String descImageNames;
 }

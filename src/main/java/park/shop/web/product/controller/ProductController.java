@@ -16,10 +16,7 @@ import park.shop.domain.file.File;
 import park.shop.domain.member.Member;
 import park.shop.repository.file.FileRepository;
 import park.shop.repository.product.ProductSearchCond;
-import park.shop.web.product.dto.ProductDescDto;
-import park.shop.web.product.dto.ProductInfoDto;
-import park.shop.web.product.dto.ProductRegisterDto;
-import park.shop.web.product.dto.ProductUpdateFormDto;
+import park.shop.web.product.dto.*;
 import park.shop.web.product.service.ProductService;
 import park.shop.web.util.argumentresolver.Login;
 
@@ -165,7 +162,7 @@ public class ProductController {
             @PathVariable Long id,
             Model model
     ) {
-        ProductDescDto productDescDto = productService.findById(id);
+        ProductDescFormDto productDescDto = productService.findByIdAboutForm(id);
         model.addAttribute("product", productDescDto);
         return "description";
     }
