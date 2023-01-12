@@ -6,6 +6,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -157,5 +158,15 @@ public class ProductController {
         productService.deleteProduct(id);
 
         return new ResultDto(true);
+    }
+
+    @GetMapping("/desc/form/{id}")
+    public String productDescriptionForm(
+            @PathVariable Long id,
+            Model model
+    ) {
+        ProductDescDto productDescDto = productService.findById(id);
+        model.addAttribute("product", productDescDto);
+        return "description";
     }
 }

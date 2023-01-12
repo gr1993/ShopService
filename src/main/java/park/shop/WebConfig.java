@@ -34,6 +34,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "/member/logout",
                         "/product/image/**",
                         "/product/all/list",
+                        "/product/desc/form/**",
                         "/img/**", "/css/**", "/assets/**",
                         "/*.ico", "/error/**"
                 );
