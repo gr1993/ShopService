@@ -159,6 +159,7 @@ public class ProductController {
 
     @GetMapping("/desc/form/{id}")
     public String productDescriptionForm(
+            @Login Member member,
             @PathVariable Long id,
             Model model
     ) {
