@@ -3,6 +3,7 @@ package park.shop.web.order.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import park.shop.common.dto.Pageable;
 import park.shop.domain.member.Member;
 import park.shop.domain.order.Orders;
 import park.shop.domain.product.Product;
@@ -10,9 +11,16 @@ import park.shop.repository.member.MemberRepository;
 import park.shop.repository.order.OrderRepository;
 import park.shop.repository.product.ProductRepository;
 import park.shop.repository.product.ProductUpdateDto;
+import park.shop.web.order.dto.MyOrderInfoDto;
 import park.shop.web.order.dto.OrderInfoDto;
 import park.shop.web.order.dto.OrderSaveDto;
 import park.shop.web.util.MerchantUidUtil;
+import park.shop.web.util.formatter.LocalDateTimeFormatter;
+import park.shop.web.util.formatter.NumberFormatter;
+
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -69,5 +77,24 @@ public class OrderService {
         
         //주문한 수량 만큼, 상품 수량 차감
         productRepository.updateQuantity(orderedProduct.getId(), orderedProduct.getQuantity() - order.getQuantity());
+    }
+
+    public List<MyOrderInfoDto> findMyOrders(Member member, Pageable pageable) {
+        List<Orders> findOrders = orderRepository.findMyOrderAll(member, pageable);
+        LocalDateTimeFormatter dateTimeFormatter = new LocalDateTimeFormatter();
+        NumberFormatter numberFormatter = new NumberFormatter();
+
+        return findOrders.stream()
+                .map(order -> {
+                    MyOrderInfoDto myOrderInfoDto = new MyOrderInfoDto();
+                    myOrderInfoDto.setMainImageId(order.getProduct().getMainImage().getId());
+                    myOrderInfoDto.setName(order.getProduct().getName());
+                    myOrderInfoDto.setQuantity(order.getQuantity());
+                    myOrderInfoDto.setPrice(numberFormatter.print(order.getPrice(), Locale.KOREA) + "원");
+                    myOrderInfoDto.setPg(order.getPg());
+                    myOrderInfoDto.setCreateDt(dateTimeFormatter.print(order.getCreateDt(), Locale.KOREA));
+                    return myOrderInfoDto;
+                })
+                .collect(Collectors.toList());
     }
 }

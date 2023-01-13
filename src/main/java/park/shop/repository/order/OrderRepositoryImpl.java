@@ -6,10 +6,13 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import park.shop.common.dto.Pageable;
+import park.shop.domain.member.Member;
 import park.shop.domain.order.Orders;
 import park.shop.domain.order.QOrders;
 
 import javax.persistence.EntityManager;
+import java.util.List;
 import java.util.Optional;
 
 import static park.shop.domain.order.QOrders.*;
@@ -38,6 +41,24 @@ public class OrderRepositoryImpl implements OrderRepository{
                 .from(orders)
                 .where(likeMerchantUid(merchantUid))
                 .fetchOne();
+    }
+
+    @Override
+    public List<Orders> findMyOrderAll(Member member, Pageable pageable) {
+        return query.select(orders)
+                .from(orders)
+                .where(equalMemberId(member))
+                .orderBy(
+                        orders.createDt.desc()
+                )
+                .fetch();
+    }
+
+    private BooleanExpression equalMemberId(Member member) {
+        if (member != null) {
+            return orders.member.eq(member);
+        }
+        return null;
     }
 
     private BooleanExpression likeMerchantUid(String merchantUid) {

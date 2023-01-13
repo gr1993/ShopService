@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html th:replace="~{layout/homeLayout :: layout(~{::title},~{::header},~{::section})}"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>박신사 - 주문 내역</title>
+</head>
+<body>
+<!-- Header-->
+<header>
+</header>
+<!-- Section-->
+<section class="py-5">
+    <style>
+        .order-container {
+            padding: 20px;
+            width: 1000px;
+            height: 690px;
+            margin: 0px auto;
+        }
+        .btn-container {
+            display: flex;
+            justify-content: flex-end;
+        }
+        .product-image {
+            width: 120px;
+            height: 120px;
+        }
+        .order-pagination-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+        }
+    </style>
+    <div class="order-container">
+        <h2 class="mb-3">주문 내역</h2>
+        <div class="btn-container">
+            <button type="button" class="btn btn-danger m-2">주문 취소</button>
+        </div>
+        <table class="table table-success table-striped">
+            <thead>
+                <tr>
+                    <th class="text-center" scope="col">선택</th>
+                    <th class="text-center" scope="col">이미지</th>
+                    <th class="text-center" scope="col">상품명</th>
+                    <th class="text-center" scope="col">수량</th>
+                    <th class="text-center" scope="col">결제액</th>
+                    <th class="text-center" scope="col">결제 방법</th>
+                    <th class="text-center" scope="col">주문일</th>
+                </tr>
+            </thead>
+            <tbody id="orderTableBody">
+            </tbody>
+        </table>
+        <div class="order-pagination-container">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination" id="orderPagination">
+                </ul>
+            </nav>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        //한 페이지에 3개 씩 출력
+        const pageSize = 3;
+
+        window.onload = function () {
+            searchOrder(1);
+        }
+
+        //주문 내역 조회 함수
+        function searchOrder(page) {
+            //페이지네이션 파라미터 적용
+            let param = `?pageSize=${pageSize}&page=${page}`;
+
+            $.ajax({
+                type: 'GET',
+                url: '/order/member/list' + param,
+                success: function(res) {
+                  if (res.success) {
+                    let template = '';
+                    for(var index=0; index < res.data.length; index++) {
+                       const order = res.data[index];
+
+                       template += `
+                        <tr>
+                          <td class="text-center"><input type="checkbox" name="orderCheck" orderId="${order.id}"></td>
+                          <td class="text-center"><img src="/product/image/${order.mainImageId}" class="product-image"></td>
+                          <td class="text-center">${order.name}</td>
+                          <td class="text-center">${order.quantity}</td>
+                          <td class="text-center">${order.price}</td>
+                          <td class="text-center">${order.pg}</td>
+                          <td class="text-center">${order.createDt}</td>
+                        </tr>
+                        `
+                    }
+
+                    //테이블에 데이터 표시
+                    const table = $("#orderTableBody")[0];
+                    table.innerHTML = template;
+
+                    //페이지네이션 적용
+                    setPagination(res.totalCount, page);
+                  }
+                }
+            })
+        }
+
+        //페이지네이션 셋팅
+        function setPagination(totalCount, page) {
+          const isPageAdd = (totalCount % pageSize) != 0;
+          const totalPage = Math.floor(totalCount / pageSize) + (isPageAdd ? 1 : 0);
+
+          let template = '';
+          template += '<li class="page-item" onclick="pageClickEvent(1)"><a class="page-link" href="#">시작</a></li>';
+
+          const currentPage = page;
+          //3페이지까지는 1부터 표시하나 4부터는 (현재 페이지 -2)페이지부터 표시
+          page = page > 3 ? page - 2 : 1;
+
+          for(var index = page; index < page + 5; index++) {
+            if (index == currentPage) {
+              template += `<li class="page-item active" onclick="pageClickEvent(${index})"><a class="page-link" href="#">${index}</a></li>`;
+            }
+            else if(index <= totalPage) {
+              template += `<li class="page-item" onclick="pageClickEvent(${index})"><a class="page-link" href="#">${index}</a></li>`;
+            }
+          }
+
+          template += `<li class="page-item" onclick="pageClickEvent(${totalPage})"><a class="page-link" href="#">끝</a></li>`;
+
+          const pagination = $("#orderPagination")[0];
+          pagination.innerHTML = template;
+        }
+
+        //페이지 클릭 이벤트
+        function pageClickEvent(page) {
+          searchOrder(page);
+        }
+    </script>
+</section>
+</body>
+</html>
