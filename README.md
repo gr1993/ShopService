@@ -19,3 +19,6 @@
 ![회원가입](./capture/join.PNG)
 ![상품등록](./capture/product.PNG)
 ![메인](./capture/main.PNG)
+![상품상세](./capture/product-description.PNG)
+![결제](./capture/payment.PNG)
+![주문내역](./capture/myorder.PNG)
