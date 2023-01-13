@@ -64,6 +64,18 @@ public class OrderController {
 
         ResultDto resultDto = new ResultDto(true);
         resultDto.setData(myOrders);
+        resultDto.setTotalCount(orderService.findMyOrdersCount(member));
         return resultDto;
+    }
+
+    @ResponseBody
+    @GetMapping("/cancel/{id}")
+    public Object myOrderCancel(
+            @Login Member member,
+            @PathVariable("id") Long orderId
+    ) {
+        orderService.cancelOrder(member, orderId);
+
+        return new ResultDto(true);
     }
 }

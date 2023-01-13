@@ -34,7 +34,7 @@
     <div class="order-container">
         <h2 class="mb-3">주문 내역</h2>
         <div class="btn-container">
-            <button type="button" class="btn btn-danger m-2">주문 취소</button>
+            <button type="button" class="btn btn-danger m-2" onclick="cancelOrderBtnClick()">주문 취소</button>
         </div>
         <table class="table table-success table-striped">
             <thead>
@@ -134,6 +134,29 @@
         //페이지 클릭 이벤트
         function pageClickEvent(page) {
           searchOrder(page);
+        }
+
+        //주문 취소 이벤트
+        function cancelOrderBtnClick() {
+           var checkbox = $("input[name=orderCheck]:checked");
+           if (checkbox.length === 1) {
+             if (confirm([[#{order.payment.cancel}]])) {
+                var orderId = checkbox[0].getAttribute('orderId');
+
+                $.ajax({
+                  type: 'GET',
+                  url: `/order/cancel/${orderId}`,
+                  success: function(res) {
+                    if(res.success) {
+                      alert([[#{order.payment.cancel.complete}]])
+                      location.reload();
+                    }
+                  }
+                });
+             }
+           } else {
+             alert([[#{product.select.one}]])
+           }
         }
     </script>
 </section>

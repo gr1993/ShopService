@@ -30,6 +30,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final MemberRepository memberRepository;
+    private final PaymentService paymentService;
 
     public OrderInfoDto getOrderInfo(Long memberId, Long productId, Integer orderQuantity) {
         Member member = memberRepository.findById(memberId).orElse(null);
@@ -87,6 +88,7 @@ public class OrderService {
         return findOrders.stream()
                 .map(order -> {
                     MyOrderInfoDto myOrderInfoDto = new MyOrderInfoDto();
+                    myOrderInfoDto.setId(order.getId());
                     myOrderInfoDto.setMainImageId(order.getProduct().getMainImage().getId());
                     myOrderInfoDto.setName(order.getProduct().getName());
                     myOrderInfoDto.setQuantity(order.getQuantity());
@@ -96,5 +98,25 @@ public class OrderService {
                     return myOrderInfoDto;
                 })
                 .collect(Collectors.toList());
+    }
+
+    public Long findMyOrdersCount(Member member) {
+        return orderRepository.findMyOrderAllCount(member);
+    }
+
+    public void cancelOrder(Member member, Long id) {
+        try {
+            Orders order = orderRepository.findById(id).orElse(null);
+            if (order.getMember().getId() != member.getId()) {
+                throw new IllegalArgumentException("주문한 사용자와 요청한 사용자가 일치하지 않습니다.");
+            }
+
+            String token = paymentService.getToken();
+            paymentService.paymentCancel(token, order.getMerchantUid(), order.getPrice(), "구매자 취소 요청");
+
+            orderRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new IllegalStateException(e.getMessage(), e);
+        }
     }
 }

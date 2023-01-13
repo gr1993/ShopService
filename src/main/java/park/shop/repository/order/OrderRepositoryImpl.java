@@ -54,6 +54,29 @@ public class OrderRepositoryImpl implements OrderRepository{
                 .fetch();
     }
 
+    @Override
+    public Long findMyOrderAllCount(Member member) {
+        return query.select(orders.count())
+                .from(orders)
+                .where(equalMemberId(member))
+                .fetchFirst();
+    }
+
+
+    @Override
+    public Optional<Orders> findById(Long id) {
+        Orders findOrder = em.find(Orders.class, id);
+        return Optional.ofNullable(findOrder);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        Orders findOrder = findById(id).orElse(null);
+        if(findOrder != null) {
+            em.remove(findOrder);
+        }
+    }
+
     private BooleanExpression equalMemberId(Member member) {
         if (member != null) {
             return orders.member.eq(member);

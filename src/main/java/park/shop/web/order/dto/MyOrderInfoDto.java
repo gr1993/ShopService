@@ -6,6 +6,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class MyOrderInfoDto {
+
+    private Long id;
+
     private Long mainImageId;
 
     private String name;
