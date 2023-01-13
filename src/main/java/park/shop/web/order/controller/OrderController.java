@@ -3,13 +3,11 @@ package park.shop.web.order.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import park.shop.common.dto.ResultDto;
 import park.shop.domain.member.Member;
 import park.shop.web.order.dto.OrderInfoDto;
+import park.shop.web.order.dto.OrderSaveDto;
 import park.shop.web.order.service.OrderService;
 import park.shop.web.util.argumentresolver.Login;
 
@@ -33,5 +31,16 @@ public class OrderController {
         ResultDto resultDto = new ResultDto(true);
         resultDto.setData(orderInfo);
         return resultDto;
+    }
+
+    @ResponseBody
+    @PostMapping("/save")
+    public Object orderProductSave(
+            @Login Member member,
+            @ModelAttribute OrderSaveDto orderSaveDto
+    ) {
+        orderService.saveOrder(member, orderSaveDto);
+
+        return new ResultDto(true);
     }
 }

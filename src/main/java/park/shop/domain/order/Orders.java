@@ -29,13 +29,13 @@ public class Orders {
     @Column
     private Integer quantity;
 
-    @Column(name = "is_payment")
+    @Column(name = "is_payment", length = 5)
     private String isPayment;
 
-    @Column
+    @Column(length = 50)
     private String pg;
 
-    @Column(name = "merchant_uid")
+    @Column(name = "merchant_uid", length = 100)
     private String merchantUid;
 
     @Column

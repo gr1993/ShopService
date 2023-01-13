@@ -10,6 +10,7 @@ import park.shop.repository.member.MemberRepository;
 import park.shop.repository.order.OrderRepository;
 import park.shop.repository.product.ProductRepository;
 import park.shop.web.order.dto.OrderInfoDto;
+import park.shop.web.order.dto.OrderSaveDto;
 import park.shop.web.util.MerchantUidUtil;
 
 @Service
@@ -38,15 +39,33 @@ public class OrderService {
             result.setAmount(product.getSalePrice() * orderQuantity);
         }
 
-        Orders findOrder = orderRepository.findByMerchantUid(MerchantUidUtil.getTodayMerchantUid()).orElse(null);
-        if (findOrder == null) {
+        String merChantUid = orderRepository.findMaxByMerchantUidLike(MerchantUidUtil.getTodayMerchantUid());
+        if (merChantUid == null) {
             result.setMerchantUid(MerchantUidUtil.getFirstMerchantUid());
         } else {
-            result.setMerchantUid(MerchantUidUtil.getNextMerchantUid(findOrder.getMerchantUid()));
+            result.setMerchantUid(MerchantUidUtil.getNextMerchantUid(merChantUid));
         }
 
         result.setMemberName(member.getName());
         result.setMemberAddress(member.getAddress());
         return result;
+    }
+
+    public void saveOrder(Member member, OrderSaveDto orderSaveDto) {
+        Product orderedProduct = productRepository.findById(orderSaveDto.getProductId()).orElse(null);
+        if (orderedProduct == null) {
+            throw new IllegalArgumentException();
+        }
+
+        Orders order = new Orders();
+        order.setMember(member);
+        order.setProduct(orderedProduct);
+        order.setPrice(orderSaveDto.getAmount());
+        order.setQuantity(orderSaveDto.getQuantity());
+        order.setIsPayment("Y");
+        order.setPg(orderSaveDto.getPg());
+        order.setMerchantUid(orderSaveDto.getMerchantUid());
+
+        orderRepository.save(order);
     }
 }

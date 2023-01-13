@@ -199,6 +199,12 @@
                 //buyer_postcode: "01181"             //구매자 우편번호, 이 프로젝트에서 우편번호 없음
             }, function (rsp) {
                 if (rsp.success) {
+                    registerOrder({
+                        productId,
+                        orderQuantity,
+                        pg : rsp.pg_provider,
+                        ...orderInfoDto
+                    });
                     alert([[#{order.payment.complete}]]);
                 } else {
                     alert([[#{order.payment.fail}]]);
@@ -207,8 +213,26 @@
         }
 
         //결제된 정보 저장 함수
-        function registerOrder() {
+        function registerOrder(orderInfo) {
+            const formData = new FormData();
+            formData.append('productId', orderInfo.productId);
+            formData.append('amount', orderInfo.amount);
+            formData.append('quantity', orderInfo.orderQuantity);
+            formData.append('merchantUid', orderInfo.merchantUid);
+            formData.append('pg', orderInfo.pg);
 
+            $.ajax({
+                type:"POST",
+                url: "/order/save",
+                processData: false,
+                contentType: false,
+                data: formData,
+                success: function(res) {
+                  if (res.success) {
+                    alert('주문이 정상적으로 처리되었습니다.')
+                  }
+                }
+            })
         }
     </script>
     <!-- iamport.payment.js -->

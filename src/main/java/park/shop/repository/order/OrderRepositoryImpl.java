@@ -1,13 +1,18 @@
 package park.shop.repository.order;
 
 
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import park.shop.domain.order.Orders;
+import park.shop.domain.order.QOrders;
 
 import javax.persistence.EntityManager;
 import java.util.Optional;
+
+import static park.shop.domain.order.QOrders.*;
 
 @Repository
 @Transactional
@@ -28,7 +33,17 @@ public class OrderRepositoryImpl implements OrderRepository{
     }
 
     @Override
-    public Optional<Orders> findByMerchantUid(String merchantUid) {
-        return Optional.empty();
+    public String findMaxByMerchantUidLike(String merchantUid) {
+        return query.select(orders.merchantUid.max())
+                .from(orders)
+                .where(likeMerchantUid(merchantUid))
+                .fetchOne();
+    }
+
+    private BooleanExpression likeMerchantUid(String merchantUid) {
+        if(StringUtils.hasText(merchantUid)) {
+            return orders.merchantUid.like(merchantUid + "%");
+        }
+        return null;
     }
 }

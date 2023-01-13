@@ -8,5 +8,5 @@ public interface OrderRepository {
 
     Orders save(Orders order);
 
-    Optional<Orders> findByMerchantUid(String merchantUid);
+    String findMaxByMerchantUidLike(String merchantUid);
 }
