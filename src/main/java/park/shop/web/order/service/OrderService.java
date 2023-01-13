@@ -111,9 +111,14 @@ public class OrderService {
                 throw new IllegalArgumentException("주문한 사용자와 요청한 사용자가 일치하지 않습니다.");
             }
 
+            //아임포트에 결제 취소 요청
             String token = paymentService.getToken();
             paymentService.paymentCancel(token, order.getMerchantUid(), order.getPrice(), "구매자 취소 요청");
 
+            //주문 취소시 상품 수량 되돌리기
+            productRepository.updateQuantity(order.getProduct().getId(), order.getProduct().getQuantity() + order.getQuantity());
+            
+            //주문 삭제
             orderRepository.deleteById(id);
         } catch (Exception e) {
             throw new IllegalStateException(e.getMessage(), e);
