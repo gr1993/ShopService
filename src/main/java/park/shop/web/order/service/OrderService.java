@@ -9,6 +9,7 @@ import park.shop.domain.product.Product;
 import park.shop.repository.member.MemberRepository;
 import park.shop.repository.order.OrderRepository;
 import park.shop.repository.product.ProductRepository;
+import park.shop.repository.product.ProductUpdateDto;
 import park.shop.web.order.dto.OrderInfoDto;
 import park.shop.web.order.dto.OrderSaveDto;
 import park.shop.web.util.MerchantUidUtil;
@@ -28,7 +29,6 @@ public class OrderService {
         if(product == null) {
             return null;
         }
-
 
         OrderInfoDto result = new OrderInfoDto();
         result.setProductName(product.getName());
@@ -65,7 +65,9 @@ public class OrderService {
         order.setIsPayment("Y");
         order.setPg(orderSaveDto.getPg());
         order.setMerchantUid(orderSaveDto.getMerchantUid());
-
         orderRepository.save(order);
+        
+        //주문한 수량 만큼, 상품 수량 차감
+        productRepository.updateQuantity(orderedProduct.getId(), orderedProduct.getQuantity() - order.getQuantity());
     }
 }

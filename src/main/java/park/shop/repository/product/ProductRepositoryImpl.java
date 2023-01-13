@@ -85,6 +85,12 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
+    public void updateQuantity(Long productId, Integer quantity) {
+        Product findProduct = em.find(Product.class, productId);
+        findProduct.setQuantity(quantity);
+    }
+
+    @Override
     public void deleteById(Long productId) {
         Product findProduct = findById(productId).orElse(null);
 

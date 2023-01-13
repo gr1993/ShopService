@@ -18,5 +18,7 @@ public interface ProductRepository {
 
     void update(Long productId, ProductUpdateDto updateDto);
 
+    void updateQuantity(Long productId, Integer quantity);
+
     void deleteById(Long productId);
 }

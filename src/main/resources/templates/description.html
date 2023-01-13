@@ -139,10 +139,15 @@
 
         //주문버튼 클릭 이벤트
         function orderProduct() {
+            const quantityInput = $('#quantity')[0];
             //주문 수량 입력 여부 확인
             const orderQuantityInput = $('#orderQuantity')[0];
             if(!orderQuantityInput.value) {
                 alert('구매 수량을 입력하세요.');
+                return;
+            }
+            if(Number(quantityInput.value) <= 0) {
+                alert('매진된 상품입니다.');
                 return;
             }
             if(Number(orderQuantityInput.value) <= 0) {
@@ -230,6 +235,7 @@
                 success: function(res) {
                   if (res.success) {
                     alert('주문이 정상적으로 처리되었습니다.')
+                    location.reload();
                   }
                 }
             })
