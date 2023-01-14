@@ -48,9 +48,6 @@ public class Member {
     @Column
     private LocalDateTime updateDt;
 
-    @OneToMany
-    private List<Product> products = new ArrayList<>();
-
     public Member() {
     }
 

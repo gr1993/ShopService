@@ -29,6 +29,7 @@ dependencies {
 	implementation 'org.apache.commons:commons-lang3:3.12.0'
 
 	implementation 'com.mysql:mysql-connector-j:8.0.31'
+	runtimeOnly 'com.h2database:h2'
 
 	implementation 'com.querydsl:querydsl-jpa'
 	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jpa"
